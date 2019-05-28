@@ -373,11 +373,13 @@ def from_prototype_file_to_file(path_to_prot_files, path_to_new_files, numb):
     data_prot= open(path_to_prot_files).readlines()
     data_new=  open(path_to_new_files,'w')
     for n,line in enumerate(data_prot):
-        if re.findall('/', line):
-            data_new.write(line)
-        else:
-            string= line.split('*')
-            if len(string) == 2:
-				data_new.write(string[0]+str(numb)+string[1])
+	# WLdH
+        #  if re.findall('/', line):
+        #      data_new.write(line)
+        #  else:
+        #      string= line.split('*')
+        #      if len(string) == 2:
+	#           data_new.write(string[0]+str(numb)+string[1])
+	data_new.write(line.replace("*",str(numb)))
     data_new.close()
     return None    
