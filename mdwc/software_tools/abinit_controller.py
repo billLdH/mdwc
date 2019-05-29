@@ -17,6 +17,43 @@ masses = [0.0, 1.00794, 4.002602, 6.941, 9.012182, 10.811, 12.011, 14.00674, 15.
           253.0, 256.0, 254.0, 257.0, 260.0,None, None, None, None, None, None,\
           None, None, None, None, None, None, None, None]
 
+# Units converter
+units = { 
+          # Distance
+          "Bohr_Ang"        : 0.52917720859,
+          # Energy
+          "Ha_eV"           : 27.21138386,
+          "Ha_K"            : 315774.65,
+          "Ha_THz"          : 6579.683920722,
+          "Ha_J"            : 4.35974394e-18,
+          "Ha_Ry"           : 2.,
+          "Ha_kJmol"        : 2625.5002,
+          "Ha_kcalmol"      : 627.50960803,
+          "Ha_cm-1"         : 219474.63,
+          "C_K"             : 273.15,
+	  # Pressure
+	  "HaBohr3_GPa"     : 29421.02648438959,
+	  "HaBohr3_kbar"    : 2942.102648438959,
+          "HaBohr3_eVAng3"  : 5.445685661749e-3,
+          "GPa_kbar"        : 10.,
+          # Force
+          "HaBohr_eVAng"    : 51.42208619083232,
+          # Time
+          "au_s"            : 2.41884326e-17,
+          "au_fs"           : 2.41884326e-2,
+	  # Angle
+	  "Deg_Rad"         : np.pi/180.
+        }
+
+# Physical constants
+cst = { "pi"                : np.cos(-1.),
+	"Avogadro"          : 6.02214179e23, 
+	"Speed_of_light"    : 2.99792458e8,  # m/s
+        "amu_emass"         : 1.660538782e-27/9.10938215e-31,
+        "kb_HaK"            : 8.617343e-5/27.21138386,
+        "e_Cb"              : 1.602176487e-19
+        }
+
 def get_nat_mass_latvec_in_strten_in(path_to_file):
     data= open(path_to_file).read()
     nat= int(re.findall('natom\s+([0-9]+)', data)[0])
@@ -73,14 +110,26 @@ def get_xred_fcart(path_to_file, nat):
 
 def get_md_parameters(path_to_file):
     data= open(path_to_file).read()
-    Qmass= float(re.findall('\s*Qmass\s+(\d+.\d*)', data)[0])
+    # Barostat and Thermostat masses
+    Qmass= float(re.findall('\s*Qmass\s+(.*)',data)[0].split()[0])
     #temp= float(re.findall('\s*temp\s+(\d+.\d*)', data)[0])
-    bmass= float(re.findall('\s*bmass\s+(\d+.\d*)', data)[0])
-    Pressure= float(re.findall('\s*Pressure\s+(\d+.\d*)', data)[0])
-    dt= float(re.findall('\s*dt\s+(\d+.\d*)', data)[0])
-    correct_spteps= int(re.findall('\s*correct_spteps\s+(\d+)', data)[0])
-    md_steps= int(re.findall('\s*md_steps\s+(\d+)', data)[0])
-    abinit_steps= int(re.findall('\s*abinit_steps\s+(\d+)', data)[0])
+    bmass= float(re.findall('\s*bmass\s+(.*)',data)[0].split()[0])
+    # Pressure
+    Pressure= float(re.findall('\s*Pressure\s+(.*)',data)[0].split()[0])
+    if len(re.findall('\s*Pressure\s+(.*)',data)[0].split()) > 1:
+    	if str(re.findall('\s*Pressure\s+(.*)',data)[0].split()[1]) == "GPa":
+        	Pressure /= units["HaBohr3_GPa"]
+    	elif str(re.findall('\s*Pressure\s+(.*)',data)[0].split()[1]) == "kbar":
+        	Pressure /= units["HaBohr3_kbar"]
+    # Time step
+    dt= float(re.findall('\s*dt\s+(.*)',data)[0].split()[0])
+    if len(re.findall('\s*dt\s+(.*)',data)[0].split()) > 2:
+	if str(re.findall('\s*dt\s+(.*)',data)[0].split()[1]) == "au":
+		dt *= units["au_fs"] 
+    # MD steps
+    correct_spteps= int(re.findall('\s*correct_spteps\s+(.*)',data)[0].split()[0])
+    md_steps= int(re.findall('\s*md_steps\s+(.*)',data)[0].split()[0])
+    abinit_steps= int(re.findall('\s*abinit_steps\s+(.*)',data)[0].split()[0])
     #return Qmass, temp, bmass, Pressure, dt, correct_spteps, md_steps, abinit_steps
     return Qmass, bmass, Pressure, dt, correct_spteps, md_steps, abinit_steps
  
@@ -110,25 +159,50 @@ def temp_data_reader(path_to_file, md_total):
         return temp_arra
     elif indicator == 1:
         if n_cons == 1:
-            temp= float(re.findall('temp_cons([ 0-9 \. \s ,]*)', data_file)[0])
+	    temp= re.findall('\s*temp_cons\s+(.*)',data_file)[0].split(" ")
+            if not temp[-1].replace('.','',1).isdigit(): # Unit is given
+		unit = temp[-1]
+		temp= float(temp[0])
+		if unit == "C":
+			temp= temp+units["C_K"]
+	    else:
+		temp= float(temp[0])
             arra= np.ones(md_total, dtype=float)
             temp_arra= temp*arra
             return temp_arra
         elif n_line == 1:
-            temp= re.findall('temp_line([ 0-9 \. \s ,]*)', data_file)[0]
-            temp= temp.split(',')
-            temp= map(float, temp[:len(temp)-1])
+	    temp= re.findall('\s*temp_line\s+(.*)',data_file)[0].split(",")
+            if not temp[-1].replace('.','',1).isdigit(): # Unit is given
+		unit = temp[-1].split()[1]
+		temp[-1]=temp[-1].split()[0]
+		temp= map(float,temp)
+		if unit == "C":
+			temp=[t+units["C_K"] for t in temp]
+	    else:
+		temp= map(float,temp)
             delta= (temp[1] - temp[0])/md_total
             temp_arra= np.arange(temp[0], temp[1], delta)
             return temp_arra
         elif n_plat == 1:
-            temp= re.findall('temp_plat([ 0-9 \. \s ,]*)', data_file)[0]
-            temp= temp.split(',')
-            temp= map(float, temp[:len(temp)-1])
+            temp= re.findall('\s*temp_plat\s+(.*)',data_file)[0].split(",")
+	    if not temp[-1].replace('.','',1).isdigit(): # Unit is given
+		unit = temp[-1].split()[1]
+		temp[-1]=temp[-1].split()[0]
+                temp= map(float,temp)
+                if unit == "C":
+                        temp=[t+units["C_K"] for t in temp]
+	    else:
+                temp= map(float,temp)
 
-            step= re.findall('temp_step([ 0-9 \. \s ,]*)', data_file)[0]
-            step= step.split(',')
-            step= map(int, step[:len(step)-1])
+            step= re.findall('\s*temp_step\s+(.*)',data_file)[0].split(",")
+            if not step[-1].replace('.','',1).isdigit(): # Unit is given
+                unit = step[-1].split()[1]
+                step[-1]=step[-1].split()[0]
+                step= map(float,step)
+                if unit == "C":
+                        step=[t+units["C_K"] for t in step]
+            else:
+                step= map(float,step)
 
             for i, t in enumerate(temp):
                 if i == 0:
@@ -144,7 +218,22 @@ def temp_data_reader(path_to_file, md_total):
         print 'only one type of temperature control'
         temp_arra=[]
         return temp_arra
-    
+
+def get_constrains_values(line,tag,num,out_type):
+	# Read data
+	array = re.findall('\s*'+str(tag)+'\s+(.*)', line)[0].split(',')
+	array.remove('')
+	# Check if unit is given
+	unit = None
+	if not array[-1].replace('.','',1).isdigit():
+		unit= array[-1].split()[-1]
+		array[-1].replace(unit,'')
+	if len(array[0]) == 1:
+		array= np.array(map(out_type,array[:num]))
+	else:
+		array= np.array([map(out_type,item.split()) for item in array[:num]])
+	return array,unit
+
 def get_md_constrains(path_to_file):
 	data= open(path_to_file).readlines()
 	#number_constrains= []
@@ -156,23 +245,20 @@ def get_md_constrains(path_to_file):
 	atom_fix_valu= []
 	atom_fix_cord= []
 	for line in data:
+                line = line.split('#')[0] # Remove comment
 		if re.match('number_bond_constrains', line):
 			numb_bond_cons= int(re.findall('\s*number_bond_constrains\s+(\d+)', line)[0])
 			#number_constrains.append(numb_bond_cons)
 		elif re.match('bond_constrains', line) :
 			if numb_bond_cons != 0:
-				data= line.split('#')
-				data= re.findall('\s*bond_constrains\s+(.+)', data[0])[0].split(',')
-				for const in data[:numb_bond_cons]:
-					bond_const.append(map(int, const.split()))
-				bond_const= np.array(bond_const)
+				bond_const,unit = get_constrains_values(line,'bond_constrains',numb_bond_cons,int)
 			else:
 				bond_const= np.array([[1,2]])
 		elif re.match('bond_distance', line):
 			if numb_bond_cons != 0:
-				bond_valu= re.findall('\s*bond_distance\s+(.+)', line)[0].split(',')
-				bond_valu= map(float, bond_valu)
-				bond_valu= np.array(bond_valu)
+				bond_valu,unit = get_constrains_values(line,'bond_distance',numb_bond_cons,float)
+                                if unit == "Ang":
+					bond_valu/= units["Bohr_Ang"]
 				bool_bond_cons = 1
 			else:
 				bond_valu= np.array([1.00])
@@ -184,20 +270,15 @@ def get_md_constrains(path_to_file):
 			#number_constrains.append(numb_bond_cons)
 		elif re.match('atom_fixed_constrains', line):
 			if numb_atom_fix_cons != 0:
-				data= line.split('#')
-				data= re.findall('\s*atom_fixed_constrains\s+(.+)', data[0])[0].split(',')
-				for const in data[:numb_atom_fix_cons]:
-					atom_fix_const.append(map(int, const.split()))
-				atom_fix_const= np.array(atom_fix_const)
+				atom_fix_const,unit = get_constrains_values(line,'atom_fixed_constrains',numb_atom_fix_cons,int)
 			else:
 				atom_fix_const= np.array([[1]])
 
 		elif re.match('atom_fixed_position', line):
 			if numb_atom_fix_cons != 0:
-				data= str(re.findall('\s*atom_fixed_position\s+(.+)', line)[0]).split(',')
-				for const in data[:numb_atom_fix_cons]:
-					atom_fix_valu.append(map(float, const.split()))
-				atom_fix_valu= np.array(atom_fix_valu)
+				atom_fix_valu,unit = get_constrains_values(line,'atom_fixed_position',numb_atom_fix_cons,float)
+				if unit == "Ang":
+                                        bond_valu/= units["Bohr_Ang"]
 				bool_atom_fix_cons = 1
 			else:
 				atom_fix_valu= np.array([[1.00, 1.00, 1.00]])
@@ -206,10 +287,7 @@ def get_md_constrains(path_to_file):
 				
 		elif re.match('atom_fix_coordinate', line):
 			if numb_atom_fix_cons != 0:
-				data= str(re.findall('\s*atom_fix_coordinate\s+(.+)', line)[0]).split(',')
-				for const in data[:numb_atom_fix_cons]:
-					atom_fix_cord.append(map(float,map(int, const.split())))
-				atom_fix_cord= np.array(atom_fix_cord)
+				atom_fix_cord,unit= get_constrains_values(line,'atom_fix_coordinate',numb_atom_fix_cons,float)
 			else:
 				atom_fix_cord= np.array([[1.00, 1.00, 1.00]])
 #***************************************			
@@ -218,18 +296,14 @@ def get_md_constrains(path_to_file):
 			#number_constrains.append(numb_angl_cons)
 		elif re.match('angle_constrains', line):
 			if numb_angl_cons != 0:
-				data= line.split('#')
-				data= re.findall('\s*angle_constrains\s+(.+)', data[0])[0].split(',')
-				for const in data[:numb_angl_cons]:
-					angl_const.append(map(int, const.split()))
-				angl_const= np.array(angl_const)
+				angl_const,unit= get_constrains_values(line,'angle_constrains',numb_angl_cons,int)
 			else:
 				angl_const= np.array([[1,2,3]])
 		elif re.match('value_cosine_angle', line):
 			if numb_angl_cons != 0:
-				angl_valu= re.findall('\s*value_cosine_angle\s+(.+)', line)[0].split(',')
-				angl_valu= map(float, angl_valu)
-				angl_valu= np.array(angl_valu)
+				angl_valu,unit= get_constrains_values(line,'value_cosine_angle',numb_angl_cons,float)
+				if unit == "Rad":
+					angl_valu/= units["Deg_Rad"]
 				bool_angl_cons = 1
 			else:
 				angl_valu= np.array([1.00])
@@ -241,18 +315,14 @@ def get_md_constrains(path_to_file):
 			#number_constrains.append(numb_cell_para_cons)
 		elif re.match('cell_parameter_constrain', line):
 			if numb_cell_para_cons != 0:
-				data= line.split('#')
-				data= re.findall('\s*cell_parameter_constrain\s+(.+)', data[0])[0].split(',')
-				for const in data[:numb_cell_para_cons]:
-					cell_para_const.append(map(int, const.split()))
-				cell_para_const= np.array(cell_para_const)
+				cell_para_const,unit = get_constrains_values(line,'cell_parameter_constrain',numb_cell_para_cons,int)
 			else:
 				cell_para_const= np.array([[1]])
 		elif re.match('cell_parameter_value', line):
 			if numb_cell_para_cons != 0:
-				cell_para_valu= re.findall('\s*cell_parameter_value\s+(.+)', line)[0].split(',')
-				cell_para_valu= map(float, cell_para_valu)
-				cell_para_valu= np.array(cell_para_valu)
+				cell_para_valu,unit = get_constrains_values(line,'cell_parameter_value',numb_cell_para_cons,float)
+				if unit == "Ang":
+					cell_para_valu/= units["Bohr_Ang"]
 				bool_cell_para_cons = 1
 			else:
 				cell_para_valu= np.array([1.00])
@@ -264,18 +334,12 @@ def get_md_constrains(path_to_file):
 			#number_constrains.append(numb_cell_angl_cons)
 		elif re.match('cell_angle_constrain', line):
 			if numb_cell_angl_cons != 0:
-				data= line.split('#')
-				data= re.findall('\s*cell_angle_constrain\s+(.+)', data[0])[0].split(',')
-				for const in data[:numb_cell_angl_cons]:
-					cell_angl_const.append(map(int, const.split()))
-				cell_angl_const= np.array(cell_angl_const)
+				cell_angl_const,unit= get_constrains_values(line,'cell_angle_constrain',numb_cell_angl_cons,int)
 			else:
 				cell_angl_const= np.array([[1,2]])
 		elif re.match('value_cosine_cell_angle', line):
 			if numb_cell_angl_cons != 0:
-				cell_angl_valu= re.findall('\s*value_cosine_cell_angle\s+(.+)', line)[0].split(',')
-				cell_angl_valu= map(float, cell_angl_valu)
-				cell_angl_valu= np.array(cell_angl_valu)
+				cell_angl_valu,unit= get_constrains_values(line,'value_cosine_cell_angle',numb_cell_angl_cons,float)
 				bool_cell_angl_cons = 1
 			else:
 				cell_angl_valu= np.array([1.00])
@@ -286,9 +350,9 @@ def get_md_constrains(path_to_file):
 			#number_constrains.append(volu_cons)
 		elif re.match('volume_value', line):
 			if volu_cons != 0:
-				volu_valu= re.findall('\s*volume_value\s+(.+)', line)[0].split(',')
-				volu_valu= map(float, volu_valu)
-				volu_valu= np.array(volu_valu)
+				volu_valu,unit= get_constrains_values(line,'volume_value',volu_cons,float)
+				if unit == "Ang^3":
+					volu_valu/= (units["Bohr_Ang"])**3
 				bool_volu=1
 			else:
 				volu_valu= np.array([1.00])
@@ -373,13 +437,6 @@ def from_prototype_file_to_file(path_to_prot_files, path_to_new_files, numb):
     data_prot= open(path_to_prot_files).readlines()
     data_new=  open(path_to_new_files,'w')
     for n,line in enumerate(data_prot):
-	# WLdH
-        #  if re.findall('/', line):
-        #      data_new.write(line)
-        #  else:
-        #      string= line.split('*')
-        #      if len(string) == 2:
-	#           data_new.write(string[0]+str(numb)+string[1])
 	data_new.write(line.replace("*",str(numb)))
     data_new.close()
     return None    
