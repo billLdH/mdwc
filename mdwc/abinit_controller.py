@@ -48,10 +48,8 @@ units = {
 # Physical constants
 cst = { "pi"                : np.cos(-1.),
 	"Avogadro"          : 6.02214179e23, 
-	"Speed_of_light"    : 2.99792458e8,  # m/s
         "amu_emass"         : 1.660538782e-27/9.10938215e-31,
         "kb_HaK"            : 8.617343e-5/27.21138386,
-        "e_Cb"              : 1.602176487e-19
         }
 
 def get_nat_mass_latvec_in_strten_in(path_to_file):

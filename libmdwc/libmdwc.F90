@@ -1,4 +1,4 @@
-module npt_MD_suite
+module libmdwc
 
 implicit none
 
@@ -17,35 +17,34 @@ contains
 	end subroutine cross_product
 
 	subroutine invertmat(mat,matinv,n)
-		implicit none
-	    integer,intent(in) :: n
-		real(8),intent(in) :: mat(n,n)
-		real(8),intent(out)   :: matinv(n,n)
-		real(8)               :: a(n,n),div
-		integer               :: IPIV(n), INFO
-		!Here only for a 3*3 matrix
-		a=mat
-		div=(a(1,1)*a(2,2)*a(3,3)-a(1,1)*a(2,3)*a(3,2)-a(1,2)*a(2,1)*a(3,3)+a(1,2)*a(2,3)*a(3,1)+&
-		&a(1,3)*a(2,1)*a(3,2)-a(1,3)*a(2,2)*a(3,1)) 
-		div=1.d0/div
-		matinv(1,1) = (a(2,2)*a(3,3)-a(2,3)*a(3,2))*div
-		matinv(1,2) =-(a(1,2)*a(3,3)-a(1,3)*a(3,2))*div
-		matinv(1,3) = (a(1,2)*a(2,3)-a(1,3)*a(2,2))*div
-		matinv(2,1) =-(a(2,1)*a(3,3)-a(2,3)*a(3,1))*div
-		matinv(2,2) = (a(1,1)*a(3,3)-a(1,3)*a(3,1))*div
-		matinv(2,3) =-(a(1,1)*a(2,3)-a(1,3)*a(2,1))*div
-		matinv(3,1) = (a(2,1)*a(3,2)-a(2,2)*a(3,1))*div
-		matinv(3,2) =-(a(1,1)*a(3,2)-a(1,2)*a(3,1))*div
-		matinv(3,3) = (a(1,1)*a(2,2)-a(1,2)*a(2,1))*div
-		return
+          implicit none
+	  integer,intent(in) :: n
+	  real(8),intent(in) :: mat(n,n)
+	  real(8),intent(out)   :: matinv(n,n)
+	  real(8)               :: a(n,n),div
+	  !Here only for a 3*3 matrix
+	  a=mat
+	  div=(a(1,1)*a(2,2)*a(3,3)-a(1,1)*a(2,3)*a(3,2)-a(1,2)*a(2,1)*a(3,3)+a(1,2)*a(2,3)*a(3,1)+&
+	  &a(1,3)*a(2,1)*a(3,2)-a(1,3)*a(2,2)*a(3,1)) 
+	  div=1.d0/div
+	  matinv(1,1) = (a(2,2)*a(3,3)-a(2,3)*a(3,2))*div
+	  matinv(1,2) =-(a(1,2)*a(3,3)-a(1,3)*a(3,2))*div
+	  matinv(1,3) = (a(1,2)*a(2,3)-a(1,3)*a(2,2))*div
+	  matinv(2,1) =-(a(2,1)*a(3,3)-a(2,3)*a(3,1))*div
+	  matinv(2,2) = (a(1,1)*a(3,3)-a(1,3)*a(3,1))*div
+	  matinv(2,3) =-(a(1,1)*a(2,3)-a(1,3)*a(2,1))*div
+	  matinv(3,1) = (a(2,1)*a(3,2)-a(2,2)*a(3,1))*div
+	  matinv(3,2) =-(a(1,1)*a(3,2)-a(1,2)*a(3,1))*div
+	  matinv(3,3) = (a(1,1)*a(2,2)-a(1,2)*a(2,1))*div
+	  return
 	end subroutine invertmat
 
 	subroutine rotation(rotmat,angle,axe)
 		!This subroutine will calculate the rotational matrix rotmat for a
 		!3-dim vector around an axis 'axe' by the angle 'angle'.
 		implicit none
-		real(8),INTENT(IN) :: angle
-		real(8),INTENT(IN) :: axe(3)
+		real(8),intent(in) :: angle
+		real(8),intent(in) :: axe(3)
 		real(8):: rotator(3,3)
 		real(8):: rotmat(3,3)
 
@@ -78,7 +77,6 @@ contains
 		real:: s1,s2
 		real(8):: t1,t2,tt
 		! On Intel the random_number can take on the values 0. and 1.. To prevent overflow introduce eps
-		real(8),parameter:: eps=1.d-8
 		real(8),dimension(3*nat)::  vxyz
 		integer:: i,j
 		do i=1,3*nat-1,2
@@ -87,15 +85,15 @@ contains
 			call random_number(s2)
 			t2=dble(s2)
 			tt=sqrt(-2.d0*log(t1))
-			vxyz(i)=tt*cos(6.28318530717958648d0*t2)
-			vxyz(i+1)=tt*sin(6.28318530717958648d0*t2)
+			vxyz(i)=tt*cos(twopi*t2)
+			vxyz(i+1)=tt*sin(twopi*t2)
 		enddo
 		call random_number(s1)
 		t1=eps+(1.d0-2.d0*eps)*dble(s1)
 		call random_number(s2)
 		t2=dble(s2)
 		tt=sqrt(-2.d0*log(t1))
-		vxyz(3*nat)=tt*cos(6.28318530717958648d0*t2)
+		vxyz(3*nat)=tt*cos(twopi*t2)
 		!call elim_moment(nat,vel_in,amass)
 		do j=1, nat
 			do i=1, 3
@@ -115,7 +113,6 @@ contains
 		real:: s1,s2
 		real(8) :: t1,t2,tt
 		! On Intel the random_number can take on the values 0. and 1.. To prevent overflow introduce eps
-		real(8),parameter:: eps=1.d-8
 		real(8)::  vlat(9)
 
 		do i=1,3*3-1,2
@@ -124,15 +121,15 @@ contains
 			call random_number(s2)
 			t2=dble(s2)
 			tt=sqrt(-2.d0*log(t1))
-			vlat(i)=tt*cos(6.28318530717958648d0*t2)
-			vlat(i+1)=tt*sin(6.28318530717958648d0*t2)
+			vlat(i)=tt*cos(twopi*t2)
+			vlat(i+1)=tt*sin(twopi*t2)
 		enddo
 		call random_number(s1)
 		t1=eps+(1.d0-2.d0*eps)*dble(s1)
 		call random_number(s2)
 		t2=dble(s2)
 		tt=sqrt(-2.d0*log(t1))
-		vlat(3*3)=tt*cos(6.28318530717958648d0*t2)
+		vlat(3*3)=tt*cos(twopi*t2)
 		do j=1, 3
 			do i=1, 3
 				vel_lat_in(i,j)= vlat(3*(j-1) + i)
@@ -156,9 +153,6 @@ contains
 		real(8),dimension(3,nat) :: vel_scaled
 		real(8),dimension(3) :: p_total
 		integer:: iat,i_dim
-		real(8), parameter :: Ha_eV=27.21138386d0 ! 1 Hartree, in eV
-		real(8), parameter :: kb_HaK=8.617343d-5/27.21138386d0 ! Boltzmann constant in Ha/K
-		real(8), parameter :: amu_emass=1.660538782d-27/9.10938215d-31 ! 1 atomic mass unit, in electronic mass
 		real(8), parameter :: temp_fac_lat=1.d-1 !This percentage of the temperature that should be given to the lattice 
 		real(8):: rescale_vel, E_kin
 
@@ -202,9 +196,6 @@ contains
 		real(8),dimension(3,3) :: h_dot
 		real(8),dimension(3,3) :: vel_scaled
 		integer:: ih,i_dim
-		real(8), parameter :: Ha_eV=27.21138386d0 ! 1 Hartree, in eV
-		real(8), parameter :: kb_HaK=8.617343d-5/27.21138386d0 ! Boltzmann constant in Ha/K
-		real(8), parameter :: amu_emass=1.660538782d-27/9.10938215d-31 ! 1 atomic mass unit, in electronic mass
 		real(8), parameter :: temp_fac_lat=1.d-1 !This percentage of the temperature that should be given to the lattice 
 		real(8):: rescale_vel, cell_kin
 
@@ -1100,9 +1091,6 @@ contains
 		!real(8),dimension(3,nat), intent(out):: ax_out
 		!*********************************************************************
 		!Variables for my MD part
-		real(8), parameter :: Ha_eV=27.21138386d0 ! 1 Hartree, in eV
-		real(8), parameter :: kb_HaK=8.617343d-5/27.21138386d0 ! Boltzmann constant in Ha/K
-		real(8), parameter :: amu_emass=1.660538782d-27/9.10938215d-31 ! 1 atomic mass unit, in electronic mass
 		real(8):: amass(nat)
 		real(8):: pressure_md(3,3)
 		real(8):: vol_t
@@ -2985,9 +2973,6 @@ contains
 		!real(8),dimension(3,nat), intent(out):: ax_out
 		!*********************************************************************
 		!Variables for my MD part
-		real(8), parameter :: Ha_eV=27.21138386d0 ! 1 Hartree, in eV
-		real(8), parameter :: kb_HaK=8.617343d-5/27.21138386d0 ! Boltzmann constant in Ha/K
-		real(8), parameter :: amu_emass=1.660538782d-27/9.10938215d-31 ! 1 atomic mass unit, in electronic mass
 		real(8):: amass(nat)
 		real(8):: pressure_md(3,3)
 		real(8):: vol_t
@@ -3233,7 +3218,6 @@ contains
 		!*********************************************************************
 		!Variables for my MD part
 		!real(8), parameter :: Ha_eV=27.21138386 ! 1 Hartree, in eV
-		real(8) :: kb_HaK! Boltzmann constant in Ha/K
 		!real(8), parameter :: amu_emass=1.660538782d-27/9.10938215d-31 ! 1 atomic mass unit, in electronic mass
 		real(8):: m(nat) !mass of atoms
 		real(8):: vol
@@ -3263,7 +3247,6 @@ contains
 		!Assign masses to each atom (for MD)
 
 		!start MD parameters
-		kb_HaK=((8.617343d-5)/27.21138386)
 		r_t=matmul(latvec_in, xred_in)
 		v_t= vel_in
 		s_t= s_in
@@ -3341,7 +3324,6 @@ contains
 		real(8),intent(in) :: v_t_mat(3,3)
 		real(8),intent(in) :: eta_t(3,3)
 		real(8),intent(out) :: ah_t(3,3)
-		real(8), parameter :: kb_HaK=8.617343d-5/27.21138386d0
 		real(8):: pressure_md(3,3)
 		real(8):: unitmat(3,3)
 		integer :: i
@@ -3364,9 +3346,8 @@ contains
 		real(8),intent(in) :: asvt
 		real(8),intent(out) :: as_t
 		real(8):: ndf
-		real(8), parameter :: kb_HaK=8.617343d-5/27.21138386d0
 		ndf= 3.d0*nat
 		as_t= (asvt/s_t - (ndf+1)*kb_HaK*temp/s_t)/Qmass
 		return
 	end subroutine testing_as
-end module npt_MD_suite
+end module libmdwc
