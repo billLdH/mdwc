@@ -39,6 +39,7 @@ def start_message():
 
  %s 
  Version %s (%s)
+ Licence %s
 
  Authors: %s
  Contact: %s (%s)
@@ -49,6 +50,7 @@ def start_message():
     """   % (info.__name__, \
              info.__version__, \
              info.__date__, \
+             info.__licence__, \
              info.__author__, \
              info.__maintainer__, \
              info.__university__, \
