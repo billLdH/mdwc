@@ -9,7 +9,6 @@ import re
 import numpy as np
 import argparse
 from mdwc.dft import *
-from mdwc.manager.outputs import *
 
 def dft_code(data,mdfile,name):
     """
