@@ -10,13 +10,12 @@ import numpy as np
 import time
 import subprocess
 import argparse
-import mdwc.MD_suite.MD_suite as md_ft
-import mdwc.software_tools.abinit_controller as ac
+
 
 class MD:
-        """
-        Molecular Dynamics class
-        """
+    """
+    Molecular Dynamics class
+    """
     def __init__(self,path_to_file):
 
         # Input MD parameters
@@ -153,9 +152,9 @@ class MD:
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 class Structure:
-        """
-        Structure class
-        """
+    """
+    Structure class
+    """
     def __init__(self):
         self.lattice = None
         self.xred = None
@@ -166,137 +165,109 @@ class Structure:
         self.vel_h = None
         self.amu = None
 
-# * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-def write_md_output(path, bond_const, angl_const, pressure_t, volu_t, bond_constrain_t, cos_constrain_t):
-        mdout_file= open(path, 'w')
-        mdout_file.write('md_step     volume(Bohr^3)\n')
-        for i,valu in enumerate(volu_t):
-                mdout_file.write('%d          %.3f\n'%(i, valu))
-        mdout_file.write('\n')
-        mdout_file.write('md_step     pressure(hartree/Bohr^3)\n')
-        for i,valu in enumerate(pressure_t):
-                mdout_file.write('%d          %.3E\n'%(i, valu))
-        mdout_file.write('\n')
-        mdout_file.write('bond constraints\n')
-        for md_i in range(bond_constrain_t.shape[0]):
-                mdout_file.write('md_step   %d\n'% md_i)
-                mdout_file.write('atoms in bond     bond value\n')
-                for j in range(bond_constrain_t.shape[1]):
-                        mdout_file.write('%d  %d            %.3f\n'%(bond_const[j,0],\
-                        bond_const[j,1], bond_constrain_t[md_i, j]**0.5))
-        mdout_file.write('\n')
-        mdout_file.write('angle constraints\n')
-        for md_i in range(cos_constrain_t.shape[0]):
-                mdout_file.write('md_step   %d\n'% md_i)
-                mdout_file.write('atoms in angle constraint     cos of angle value\n')
-                for j in range(cos_constrain_t.shape[1]):
-                        mdout_file.write('%d  %d  %d                      %.3f\n'%(angl_const[j,0],\
-                        angl_const[j,1], angl_const[j,2], cos_constrain_t[md_i, j]))
-        mdout_file.close()
-        return
-
 # * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
-#------------------
-#   START LOOPS
-#------------------
-for i_dft_step in range(dft_steps):
-	temp= temp_arra[i_dft_step*md_steps]
-	print 'abinit step  ', i_dft_step
-	if i_dft_step == 0:
-		s_t=1.0 #thermostat degree of freedom
-		s_t_dot= 0.0#time derivative of thermostat degree of freedom
-		#First abinit run. Take the prototype xxxx.in and xxxx.files
-		#and put them in what is going to be the working directory
-		work_dir= name+str(i_dft_step)
-		subprocess.call(['mkdir', work_dir])
-		ac.from_prototype_in_to_in_step0(name+'.in', work_dir+'/'+name+str(i_dft_step)+'.in')
-		ac.from_prototype_file_to_file(name+'.files', work_dir+'/'+name+str(i_dft_step)+'.files', i_dft_step)
-	else:
-		work_dir= ac.create_directories(name, x_t, h_t, i_dft_step, pwd='.')
-	rf= open(work_dir+'/'+name+str(i_dft_step)+'.files')
-	log= open(work_dir+'/'+name+str(i_dft_step)+'.log','w')
-	#        job= subprocess.Popen('mpirun -np 4 abinit', bufsize=1048576, shell=True, \
-	#                              stdout=log, stdin=rf, cwd=work_dir)
-	if input_para['mpirum'] == True:
-		comand_string='mpirun -np %d abinit' %input_para['np'] 
-		job= subprocess.Popen(comand_string, bufsize=1048576, shell=True,\
-		stdout=log, stdin=rf, cwd=work_dir)
-	else:
-		job= subprocess.Popen('abinit', bufsize=1048576, shell=True,\
-		stdout=log, stdin=rf, cwd=work_dir)
-	n=0
-	while job.poll() == None:
-		#print job.poll()
-		time.sleep(30)
-		if os.path.exists(work_dir+'/'+name+str(i_dft_step)+'.out'):
-			output= open(work_dir+'/'+name+str(i_dft_step)+'.out','r')
-			data= output.read()
-			match= re.search('Calculation\s+completed', data)
-			if match and n == 0:
-				job.kill()
-				n=1
-	#end if match and n == 0:
-	#print job.poll()
-	nat, mass, h_t, strten_in= \
-	ac.get_nat_mass_latvec_in_strten_in(work_dir+'/'+name+str(i_dft_step)+'.out')
-	x_t, f_t= ac.get_xred_fcart(work_dir+'/'+name+str(i_dft_step)+'.out', nat)
-	#h_t_inv= np.linalg.inv(h_t)
-	#F_redu_t= np.dot(h_t_inv, f_t)
-	#out= md.md_npt_step(dt, md_steps, mass, Qmass, bmass, temp, correc_steps, x_t, x_t_dot, v_t, F_redu_t,\
-	#            h_t, h_t_dot, strten_in, P_ext, s_t, s_t_dot)
+def run_md(md,constr,name,dft_code):
+    """
+    Run Molecular Dynamics
+    """
+    for i_dft_step in range(md.dft_steps):
+        temp= temp_arra[i_dft_step*md.md_steps]
+        print 'dft step  ', i_dft_step
 
+        if i_dft_step == 0:
+            #  First dft run. Take the prototype xxxx.in and xxxx.files
+            #  and put them in what is going to be the working directory
+            md.s_t=1.0       #thermostat degree of freedom
+            md.s_tdot= 0.0  #time derivative of thermostat degree of freedom
+            work_dir= name+str(i_dft_step)
+            subprocess.call(['mkdir', work_dir],shell=True)
+            ac.from_prototype_in_to_in_step0(name+'.in', work_dir+'/'+name+str(i_dft_step)+'.in')
+            ac.from_prototype_file_to_file(name+'.files', work_dir+'/'+name+str(i_dft_step)+'.files', i_dft_step)
+        else:
+            work_dir= ac.create_directories(name, x_t, h_t, i_dft_step, pwd='.')
+        rf= open(work_dir+'/'+name+str(i_dft_step)+'.files')
+        log= open(work_dir+'/'+name+str(i_dft_step)+'.log','w')
+        #        job= subprocess.Popen('mpirun -np 4 abinit', bufsize=1048576, shell=True, \
+        #                              stdout=log, stdin=rf, cwd=work_dir)
+        if input_para['np'] is not None:
+            comand_string='mpirun -np %d abinit' % input_para['np'] 
+            job= subprocess.Popen(comand_string, bufsize=1048576, shell=True,\
+            stdout=log, stdin=rf, cwd=work_dir)
+        else:
+            job= subprocess.Popen('abinit', bufsize=1048576, shell=True,\
+            stdout=log, stdin=rf, cwd=work_dir)
+        n=0
+        while job.poll() == None:
+            #print job.poll()
+            time.sleep(30)
+            if os.path.exists(work_dir+'/'+name+str(i_dft_step)+'.out'):
+                output= open(work_dir+'/'+name+str(i_dft_step)+'.out','r')
+                data= output.read()
+                match= re.search('Calculation\s+completed', data)
+                if match and n == 0:
+                    job.kill()
+                    n=1
+        #end if match and n == 0:
+        #print job.poll()
+        nat, mass, h_t, strten_in= \
+        ac.get_nat_mass_latvec_in_strten_in(work_dir+'/'+name+str(i_dft_step)+'.out')
+        x_t, f_t= ac.get_xred_fcart(work_dir+'/'+name+str(i_dft_step)+'.out', nat)
+        #h_t_inv= np.linalg.inv(h_t)
+        #F_redu_t= np.dot(h_t_inv, f_t)
+        #out= md.md_npt_step(dt, md_steps, mass, Qmass, bmass, temp, correc_steps, x_t, x_t_dot, v_t, F_redu_t,\
+        #            h_t, h_t_dot, strten_in, P_ext, s_t, s_t_dot)
+        
         #---------------
         #   INIT VEL.
         #---------------
-	if i_dft_step == 0:
-		# Initialization of velocities
-		v_t= md_ft.npt_md_suite.init_vel_atoms(mass, temp, len(mass))
-		h_t_dot= md_ft.npt_md_suite.init_vel_lattice(bmass, temp, h_t)
-		x_t_dot= md_ft.npt_md_suite.get_x_dot(h_t, v_t, nat)
-
-	#--------------
-	#   RUN  NPT
-	#--------------
-	if not input_para['NVT'] or input_para['NPT']:
-		s_t, s_t_dot, pressure_t, volu_t,\
-		bond_constrain_t, cos_constrain_t, h_t,\
-		h_t_dot, x_t, x_dot_t, v_t= \
-                         md_ft.npt_md_suite.md_npt_constrains(h_t,x_t, \
-				x_t_dot, f_t, strten_in,v_t,h_t_dot,\
-				bond_valu, angl_valu, cell_para_valu,\
-				cell_angl_valu, volu_valu, atom_fix_valu,atom_fix_cord,\
-				P_ext,mass,\
-				Qmass, bmass, dt, temp, s_t, s_t_dot, \
-				bond_const,angl_const, cell_para_const,\
-				cell_angl_const, atom_fix_const,correc_steps, md_steps,\
-				bool_bond_cons,bool_angl_cons,\
-				bool_cell_para_cons,bool_cell_angl_cons,\
-				bool_volu,bool_atom_fix_cons,volu_cons, nat, \
-				numb_cell_angl_cons,numb_cell_para_cons,\
-				numb_angl_cons, numb_bond_cons,numb_atom_fix_cons)    
-		write_md_output(work_dir+'/'+name+str(i_dft_step)+'.mdout',\
-			bond_const, angl_const, pressure_t, volu_t, bond_constrain_t, cos_constrain_t)
-		for i,_ in enumerate(pressure_t):
-			md_time= (i_dft_step*md_steps+i)*dt
-			#pressure_volu_file.write('md_step     dft_step     total_step    time(fs)     pressure(hartree/Bohr^3)     volume(Bohr^3)\n')
-			pressure_volu_file.write('%d          %d               %d             %.3f         %.3E                         %.3f\n'\
-			%(i+1,i_dft_step+1,(i_dft_step*md_steps+i+1),md_time,pressure_t[i],volu_t[i]))
-	else:
+        if i_dft_step == 0:
+            # Initialization of velocities
+            v_t= md_ft.npt_md_suite.init_vel_atoms(mass, temp, len(mass))
+            h_t_dot= md_ft.npt_md_suite.init_vel_lattice(bmass, temp, h_t)
+            x_t_dot= md_ft.npt_md_suite.get_x_dot(h_t, v_t, nat)
+            
         #--------------
-        #   RUN  NVT
+        #   RUN  NPT
         #--------------
-
-		s_t, s_t_dot, x_t, v_t= md_ft.npt_md_suite.md_nvt_constrains(h_t,x_t, \
-				f_t,v_t,\
-				bond_valu, angl_valu,\
-				atom_fix_valu,atom_fix_cord,mass,\
-				Qmass, dt, temp, s_t, s_t_dot,\
-				bond_const,angl_const,\
-				atom_fix_const,correc_steps, md_steps,\
-				bool_bond_cons,bool_angl_cons,\
-				bool_atom_fix_cons, nat,\
-				numb_angl_cons, numb_bond_cons,numb_atom_fix_cons)
+        if not input_para['NVT'] or input_para['NPT']:
+            s_t, s_t_dot, pressure_t, volu_t,\
+            bond_constrain_t, cos_constrain_t, h_t,\
+            h_t_dot, x_t, x_dot_t, v_t= \
+                md_ft.npt_md_suite.md_npt_constrains(h_t,x_t, \
+                    x_t_dot, f_t, strten_in,v_t,h_t_dot,\
+                    bond_valu, angl_valu, cell_para_valu,\
+                    cell_angl_valu, volu_valu, atom_fix_valu,atom_fix_cord,\
+                    P_ext,mass,\
+                    Qmass, bmass, dt, temp, s_t, s_t_dot, \
+                    bond_const,angl_const, cell_para_const,\
+                    cell_angl_const, atom_fix_const,correc_steps, md_steps,\
+                    bool_bond_cons,bool_angl_cons,\
+                    bool_cell_para_cons,bool_cell_angl_cons,\
+                    bool_volu,bool_atom_fix_cons,volu_cons, nat, \
+                    numb_cell_angl_cons,numb_cell_para_cons,\
+                    numb_angl_cons, numb_bond_cons,numb_atom_fix_cons)    
+            write_md_output(work_dir+'/'+name+str(i_dft_step)+'.mdout',\
+                bond_const, angl_const, pressure_t, volu_t, bond_constrain_t, cos_constrain_t)
+            for i,_ in enumerate(pressure_t):
+                md_time= (i_dft_step*md_steps+i)*dt
+                #pressure_volu_file.write('md_step     dft_step     total_step    time(fs)     pressure(hartree/Bohr^3)     volume(Bohr^3)\n')
+                pressure_volu_file.write('%d          %d               %d             %.3f         %.3E                         %.3f\n'\
+                %(i+1,i_dft_step+1,(i_dft_step*md_steps+i+1),md_time,pressure_t[i],volu_t[i]))
+        else:
+            #--------------
+            #   RUN  NVT
+            #--------------
+        
+            s_t, s_t_dot, x_t, v_t= md_ft.npt_md_suite.md_nvt_constrains(h_t,x_t, \
+                    f_t,v_t,\
+                    bond_valu, angl_valu,\
+                    atom_fix_valu,atom_fix_cord,mass,\
+                    Qmass, dt, temp, s_t, s_t_dot,\
+                    bond_const,angl_const,\
+                    atom_fix_const,correc_steps, md_steps,\
+                    bool_bond_cons,bool_angl_cons,\
+                    bool_atom_fix_cons, nat,\
+                    numb_angl_cons, numb_bond_cons,numb_atom_fix_cons)
 pressure_volu_file.close()
 

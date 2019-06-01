@@ -6,24 +6,28 @@ NAME
 	mdwc_ - Molecular Dynamics With Constraints
 
 DESCRIPTION
-  	   The molecular dynamics with constraints (mdwc) package is a 
+        The molecular dynamics with constraints (mdwc) package is a 
 	command line open source python program. It does constraint 
 	molecular dynamics following the SHAKE algorithm with:
-   	    - NPT: keeping pressure constant with the Parrinello-Rahman 
-          	   lagrangian, and keeping the temperature constant 
-		   with the Nose thermostat) 
-   	    - NVT: keeping the temperature constant with the Nose thermostat. 
 
-	Constraints:
+   	    - NPT: keeping pressure constant with the Parrinello- 
+          	   Rahman lagrangian, and keeping the temperature 
+		   constant with the Nose thermostat) 
+
+   	    - NVT: keeping the temperature constant with the Nose 
+                   thermostat. 
+
+	Allowed constraints:
    	    - bond distances
    	    - angles
    	    - atomic positions
    	    - lattice parameters (a, b, c)
    	    - angles between lattice vectors
-   	    - volume of the unit cell.
+   	    - volume of the unit cell
 
 	Supported DFT codes:
 	    - Abinit
+            - ...
 
 SYNTAX
 	mdwc_ <sub-command> [OPTIONS]
@@ -47,11 +51,6 @@ SUB-COMMANDS
 	-nvt
 	    Run NVT Molecular Dynamics
 
-   # ----- DFT code ------------------------------
-
-        -c, --dft_code [DFT_CODE]
-            DFT code
-
    # ----- MPI -----------------------------------
 
 	-np, --ntasks [NUMBER_OF_TASKS]
@@ -69,22 +68,19 @@ LINKS
         GitHub - https://github.com/romerogroup/mdwc.git
         Documentation - https://molecular-dynamics-with-constraints.github.io/
 
+MAINTAINER
+        Prof. Romero, Aldo H. (Aldo.Romero@mail.wvu.edu)
+
+CONTRIBUTORS
+        Prof. Romero, Aldo H.  -  West Virginia University 
+        Hernandez, Arturo      -  West Virginia University 
+        Herath, Uthpala        -  West Virginia University 
+        Tavazohi, Pedram       -  West Virginia University 
+
 """
 
 from __future__ import division, print_function
-from mdwc.md_manager.mdwc_manager import main
-
-__name__="mdwc"
-__version__ =0.2.0
-__author__ = "Aldo H. Romero, Arturo Hernandez, Uthpala Herath, Pedram Tavazohi"
-#__licence__ = ""  <----- TO BE SET
-__maintainer__ ="Aldo H. Romero"
-__maintainer_email__ ="Aldo.Romero@mail.wvu.edu"
-__description__="Molecular Dynamics With Constraints"
-__date__ = "June 2019"
-__url__="https://molecular-dynamics-with-constraints.github.io/"
-__download_url__="https://github.com/romerogroup/mdwc.git"
-
+from mdwc.manager.manager import main
 
 if __name__ == "__main__":
 	main()

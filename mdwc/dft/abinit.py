@@ -7,84 +7,46 @@ import re
 import os.path
 import numpy as np
 
-def read_arguments:
-	parser = argparse.ArgumentParser(description='Paramenters for MD')
-	parser.add_argument("-n", "--name",
-			    nargs=1,
-			    help="Name of the .in, .files, .md files",
-			    dest="name",
-			    type=str,
-			    required=True)
-        parser.add_argument("-c", "--dft_code",
-                            nargs=1,
-                            help="DFT code.",
-                            dest="code",
-                            type=str,
-                            required=True)
-        parser.add_argument("-npt",
-                            nargs=0,
-                            help="NPT Molecular Dynamics (default)",
-                            dest="NPT",
-                            required=False)
-        parser.add_argument("-nvt",
-                            nargs=0,
-                            help="NVT Molecular Dynamics",
-                            dest="NVT",
-                            required=False)
-        parser.add_argument("-np", "--ntasks",
-                            nargs=1,
-                            help="Number of tasks for mpirun",
-                            dest="ntasks",
-                            type=str,
-                            required=False)
-        parser.add_argument("-mopt", "--mpi_options",
-                            nargs=1,
-                            help="Name of the .in, .files, .md files",
-                            dest="Additional mpirun options",
-                            type=str,
-                            required=False)
 
-	input_para= vars(parser.parse_args())
-
-	if input_para['name'] is None:
-		name=[file for file in os.listdir(".") if file.endswith('.in')]
-		if len(name) > 2:
-			_error("Please set name of files adding '-n [NAME]'.")
-		else:
-			name=str(name[0])
-	else:
-		name= input_para['name']
-	return input_para, name
+def check_abinit_files(name):
+    """
+    Check if the following files exist:
+        - name.in
+        - name.files
+    """
+    abi_files=[file for file in os.listdir(".") if file.endswith('.in','files')]
+    if name+".in" or name+".files" not in abi_files:
+        _error("Check name of Abinit files. Set '-n [NAME]' according to.",0)
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 def write_md_output(path, bond_const, angl_const, pressure_t, volu_t, bond_constrain_t, cos_constrain_t):
-	mdout_file= open(path, 'w')
-	mdout_file.write('md_step     volume(Bohr^3)\n')
-	for i,valu in enumerate(volu_t):
-		mdout_file.write('%d          %.3f\n'%(i, valu))
-	mdout_file.write('\n')
-	mdout_file.write('md_step     pressure(hartree/Bohr^3)\n')
-	for i,valu in enumerate(pressure_t):
-		mdout_file.write('%d          %.3E\n'%(i, valu))
-	mdout_file.write('\n')
-	mdout_file.write('bond constraints\n')
-	for md_i in range(bond_constrain_t.shape[0]):
-		mdout_file.write('md_step   %d\n'% md_i)
-		mdout_file.write('atoms in bond     bond value\n')
-		for j in range(bond_constrain_t.shape[1]):
-			mdout_file.write('%d  %d            %.3f\n'%(bond_const[j,0],\
-			bond_const[j,1], bond_constrain_t[md_i, j]**0.5))
-	mdout_file.write('\n')
-	mdout_file.write('angle constraints\n')
-	for md_i in range(cos_constrain_t.shape[0]):
-		mdout_file.write('md_step   %d\n'% md_i)
-		mdout_file.write('atoms in angle constraint     cos of angle value\n')
-		for j in range(cos_constrain_t.shape[1]):
-			mdout_file.write('%d  %d  %d                      %.3f\n'%(angl_const[j,0],\
-			angl_const[j,1], angl_const[j,2], cos_constrain_t[md_i, j]))
-	mdout_file.close()
-	return
+    mdout_file= open(path, 'w')
+    mdout_file.write('md_step     volume(Bohr^3)\n')
+    for i,valu in enumerate(volu_t):
+    	mdout_file.write('%d          %.3f\n'%(i, valu))
+    mdout_file.write('\n')
+    mdout_file.write('md_step     pressure(hartree/Bohr^3)\n')
+    for i,valu in enumerate(pressure_t):
+    	mdout_file.write('%d          %.3E\n'%(i, valu))
+    mdout_file.write('\n')
+    mdout_file.write('bond constraints\n')
+    for md_i in range(bond_constrain_t.shape[0]):
+    	mdout_file.write('md_step   %d\n'% md_i)
+    	mdout_file.write('atoms in bond     bond value\n')
+    	for j in range(bond_constrain_t.shape[1]):
+    		mdout_file.write('%d  %d            %.3f\n'%(bond_const[j,0],\
+    		bond_const[j,1], bond_constrain_t[md_i, j]**0.5))
+    mdout_file.write('\n')
+    mdout_file.write('angle constraints\n')
+    for md_i in range(cos_constrain_t.shape[0]):
+    	mdout_file.write('md_step   %d\n'% md_i)
+    	mdout_file.write('atoms in angle constraint     cos of angle value\n')
+    	for j in range(cos_constrain_t.shape[1]):
+    		mdout_file.write('%d  %d  %d                      %.3f\n'%(angl_const[j,0],\
+    		angl_const[j,1], angl_const[j,2], cos_constrain_t[md_i, j]))
+    mdout_file.close()
+    return
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 

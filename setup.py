@@ -1,19 +1,29 @@
 #!/usr/bin/env python3
 # -*- coding=utf-8 -*-
 
+from __future__ import division, print_function
 import sys
 from setuptools import setup
 from numpy.distutils.core import Extension
 # from numpy.distutils.core import setup
 
-# Check for python 3
+# Check for python requirements
 if sys.version_info[0] /= 3:
-	sys.stderr.write('Python 3.X is needed to use this package.\n')
-	sys.exit(1)
+    sys.stderr.write('Python 3.X is needed to use this package.\n')
+    sys.exit(0)
+
+if 'numpy' not in sys.modules:
+    sys.stderr.write('Numpy package is needed to use this package.\n')
+    sys.exit(0)
+else:
+    version = numpy.__version__.split(".")
+    if not all(int(item) >= 1 for item in version):
+        sys.stderr.write('Numpy >= 1.1 1 is needed to use this package.\n')
+        sys.exit(0)
 
 # Informations
 __name__="mdwc"
-__version__ =1.0.0
+__version__ =0.2.0
 __author__ = "Aldo H. Romero, Arturo Hernandez, Uthpala Herath, Pedram Tavazohi"
 # __licence__ = ""  <----- TO BE SET
 __maintainer__ ="Aldo H. Romero"
@@ -25,8 +35,10 @@ __download_url__="https://github.com/romerogroup/mdwc.git"
 
 # Program
 scripts=['scripts/mdwc_']
-packages=['mdwc',
-          'libmdwc']
+packages=['dft_interfaces',
+          'libmdwc',
+          'manager',
+          'tools']
 ext_modules=[Extension('libmdwc.libmdwc',
                        ['libmdwc/libmdwc.F90']),
              Extension('libmdwc.parameters',

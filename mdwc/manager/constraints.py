@@ -5,8 +5,6 @@ from __future__ import division, print_function
 
 import re
 import numpy as np
-import mdwc.MD_suite.MD_suite as md_ft
-import mdwc.software_tools.abinit_controller as ac
 
 class Constraints:
         """
