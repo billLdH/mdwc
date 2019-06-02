@@ -10,7 +10,7 @@ import numpy as np
 import argparse
 from mdwc.dft import *
 
-def dft_code(data,mdfile,name):
+def get_dft_code(data,mdfile,name):
     """
     Select DFT Code
     """
@@ -21,7 +21,7 @@ def dft_code(data,mdfile,name):
     elif len(code) < 1:
         _exit("DFT code is not given in input file.",0)
     else:
-        dft_code= dft_code[0]
+        dft_code= str(re.findall('\s*MD\s+(.*)',data)[0].split()[0])
 
     # ABINIT
     if dft_code in ["abinit","Abinit","ABINIT"]:

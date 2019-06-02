@@ -1,0 +1,10 @@
+__name__="mdwc"
+__version__="0.2.0"
+__author__="Aldo H. Romero, Arturo Hernandez, Uthpala Herath, Pedram Tavazohi"
+__license__ = "TO BE SET" # <----- TO BE SET
+__maintainer__ ="Aldo H. Romero"
+__maintainer_email__ ="Aldo.Romero@mail.wvu.edu"
+__description__="Molecular Dynamics With Constraints"
+__date__ = "June 2019"
+__url__="https://molecular-dynamics-with-constraints.github.io/"
+__download_url__="https://github.com/romerogroup/mdwc.git"

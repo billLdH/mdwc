@@ -1,0 +1,23 @@
+# PACKAGE_INFO
+
+   mdwc
+      |
+      |- libmdwc: Fortran sources
+      |
+      |- examples: mdwc calculation, jupyter notebooks, libmdwc's call
+      |
+      |- scripts: Python executables (mdwc_, post-treatment,...)
+      |
+      |- setup.py: Configure the Python library's installation
+      |
+      |- mdwc: Python Library
+	    |
+	    |- core: Main functions
+            |
+            |- dft: Interfaces with DFT codes
+	    |
+	    |- info.py: Informations on the mdwc code
+            |
+            |- io: Read/write main output, databases,...
+	    |
+            |- tools: Post-treatment tools, helper,...

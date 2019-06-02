@@ -20,36 +20,6 @@ def check_abinit_files(name):
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-def write_md_output(path, bond_const, angl_const, pressure_t, volu_t, bond_constrain_t, cos_constrain_t):
-    mdout_file= open(path, 'w')
-    mdout_file.write('md_step     volume(Bohr^3)\n')
-    for i,valu in enumerate(volu_t):
-    	mdout_file.write('%d          %.3f\n'%(i, valu))
-    mdout_file.write('\n')
-    mdout_file.write('md_step     pressure(hartree/Bohr^3)\n')
-    for i,valu in enumerate(pressure_t):
-    	mdout_file.write('%d          %.3E\n'%(i, valu))
-    mdout_file.write('\n')
-    mdout_file.write('bond constraints\n')
-    for md_i in range(bond_constrain_t.shape[0]):
-    	mdout_file.write('md_step   %d\n'% md_i)
-    	mdout_file.write('atoms in bond     bond value\n')
-    	for j in range(bond_constrain_t.shape[1]):
-    		mdout_file.write('%d  %d            %.3f\n'%(bond_const[j,0],\
-    		bond_const[j,1], bond_constrain_t[md_i, j]**0.5))
-    mdout_file.write('\n')
-    mdout_file.write('angle constraints\n')
-    for md_i in range(cos_constrain_t.shape[0]):
-    	mdout_file.write('md_step   %d\n'% md_i)
-    	mdout_file.write('atoms in angle constraint     cos of angle value\n')
-    	for j in range(cos_constrain_t.shape[1]):
-    		mdout_file.write('%d  %d  %d                      %.3f\n'%(angl_const[j,0],\
-    		angl_const[j,1], angl_const[j,2], cos_constrain_t[md_i, j]))
-    mdout_file.close()
-    return
-
-# * * * * * * * * * * * * * * * * * * * * * * * * * *
-
 def get_nat_mass_latvec_in_strten_in(path_to_file):
     data= open(path_to_file).read()
     nat= int(re.findall('natom\s+([0-9]+)', data)[0])
