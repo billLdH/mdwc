@@ -6,10 +6,18 @@ from __future__ import division, print_function
 import sys
 import os
 import re
+import shutil
 import numpy as np
 import argparse
+import time
+from time import time, strftime, localtim
+import datetime
 from mdwc.dft import *
-from mdwc.manager.outputs import *
+from mdwc.io.outputs import create_output,init_datafile,
+                            close_datafile,Data
+from mdwc.info import Info
+from mdwc.io.db import *
+from mdwc.dft.interface import Calculator
 
 def _error(message,code):
     """ 
@@ -17,25 +25,6 @@ def _error(message,code):
     """
     print(message)
     exit(code)
-
-# * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-def check_db_packages():
-    packages = ['xml',
-                'yaml',
-                'netCDF4',
-                'csv',
-                'json']
-
-    db_pkgs= list()
-    for pkg in packages:
-        try:
-            import pkg
-            pkgs_pkgs.append(pkg)
-        except ImportError, e:
-            print(pkg+" package is not installed")
-    
-    return db_pkgs
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -83,7 +72,7 @@ def read_arguments:
                         nargs=1,
                         help="Number of tasks for mpirun",
                         dest="ntasks",
-                        type=str,
+                        type=int,
                         required=False)
     parser.add_argument("-mopt", "--mpi_options",
                         nargs=1,
@@ -141,10 +130,11 @@ def check_files(input_para):
         mdtype= "nvt"
 
     # DFT Code
-    dft_code= interface.get_dft_code(data,mdfile,name)
+    dft_code.append(interface.get_dft_code(data,mdfile,name))
 
     # Absolute path to a pecific executable of the DFT code
-    exec_dft= [line for line in data if "exec_dft_code" in line]
+    exec_dft = [str(re.findall('\s*exec_dft_code\s+(.*)',line)[0].split()[0]) \
+                 for line in data if re.match('exec_dft_code')]
     if len(exec_dft) > 1:
         _error("Executable of the DFT code not set properly.",0)
     elif len(exec_dft) < 1:
@@ -154,7 +144,16 @@ def check_files(input_para):
         # Specific executable
         exec_dft= str(exec_dft[0])
 
-    return name, mdfile, mdtype, dft_code, exec_dft
+    if shutil.which(exec_dft) is None:
+        _error("Executable of the DFT code does not exist.",0)
+    dft_code.append(exec_dft)
+
+    # DFT Code options
+    opt_dft = [str(re.findall('\s*opt_dft_code\s+(.*)',line)[0].split()[0]) \
+                 for line in data if re.match('opt_dft_code')]
+
+    dft_code.append(opt_dft)
+    return name, mdfile, mdtype, dft_code
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -162,12 +161,13 @@ def main():
     """
     Main
     """
-    
+    # Time
+    main_time = time.clock() 
+
     # Checks arguments and if input files are here
     check()
     input_para = read_arguments()
-    name, mdfile, mdtype, dft_code, exec_dft= check_files(input_para)
-
+    name, mdfile, mdtype, dft_code= check_files(input_para)
     # Check if storage in db is possible (YAML, XML, JSON, CSV, NetCDF)
     # In this db file, we could store for each step (few ideas):
     #   - MD info (Qmass, Bmass, dt, species, psp, natom,...) <= only once
@@ -181,29 +181,42 @@ def main():
     #   - Volume
     #   - Stress tensor
     #   - Forces (atoms, cell,...)
-    db_pkgs= check_db_packages(mdfile)
+    db_fmt= check_db_packages(mdfile)
+    db = DB(name,db_fmt)
 
-    # Start printing and writting informations
-    create_output_file(name)
-    start_message()
+    # Initialize calculator
+    calc= Calculator(dft_code,input_para)
+
+    # Initialize outputs
+    datafile = Data(name)
+    init_datafile(datafile,md)
+    stdout= create_output(name,db_fmt)
+    info= Info("PACKAGE_INFO.txt")
+    start_message(info)
 
     # Set Molecular Dynamics
-    md = mdwc_manager.MD(mdfile,mdtype,dft_code)
+    md = mdwc_manager.MD(mdfile,mdtype,dft_code[0])
     md.get_md_parameters()
     md.total_steps= md.md_steps*md.dft_steps
     md.temp_data_reader(md.total_steps)
+    # write_output()
+    # write_db() <---- Needs an interface
 
     # Set Constraints
     constr = mdwc_manager.Constraints(md.mdfile)
     constr.get_md_constrains()
+    # write_output()
+    # write_db() <---- Needs an interface
+    print("Initialization duration: ",str(datetime.timedelta(time.clock() - main_time)))
 
     # Run MD
-    run_md(md,constr,name,mdtype,dft_code,exec_dft)
+    run_md(calc,md,constr,name,dft_code,datafile)
 
-    # Create output file
-    pressure_volu_file= open('pressure_volume.mdout', 'w')
-    pressure_volu_file.write( \
-      'md_step     dft_step     total_step    time(fs)     pressure(hartree/Bohr^3)     volume(Bohr^3)\n')
-   
-    # Close the main output file
+    # Close everything
     close_output_file(name)
+    close_db(db)
+    close_datafile(datafile)
+   
+    # Time
+    print("Endding date: ",strftime("%Y-%m-%d %H:%M:%S", localtime()))
+    print("Calculation duration: ",str(datetime.timedelta(time.clock() - main_time)))

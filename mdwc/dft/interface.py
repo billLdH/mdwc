@@ -10,6 +10,27 @@ import numpy as np
 import argparse
 from mdwc.dft import *
 
+def Calculator:
+    def _init__(self,dft_code,input_para):
+        self.dft_code = dft_code[0]
+        self.dft_exec = dft_code[1]
+        self.dft_opts = dft_code[2]
+        self.calc_np = input_para["np"]
+        self.calc_opts = input_para["mpi_options"]
+        self.command
+
+        if self.calc_np not None and
+           self.calc_np > 1:
+            self.command = "mpirun -np %s " % self.calc_np
+            if self.calc_opts not None:
+                self.command += "%s " % self.calc_opts
+        else:
+            self.command = ""
+
+        self.command += "%s %s" % (self.dft_exec,self.dft_opts)
+        
+# * * * * * * * * * * * * * * * * * * * * * * * * * *
+
 def get_dft_code(data,mdfile,name):
     """
     Select DFT Code
@@ -48,9 +69,9 @@ def get_dft_code(data,mdfile,name):
         dft_code= "elk"
         _exit("Not implemented yet.",0)
     # QUANTUM ESPRESSO
-    elif dft_code in ["quantum espresso","Quantum Espresso",\
-                      "QUANTUM ESPRESSO"]:
-        dft_code= "quantum espresso"
+    elif dft_code in ["QE","qe","quantum espresso",\
+                      "Quantum Espresso","QUANTUM ESPRESSO"]:
+        dft_code= "qe"
         _exit("Not implemented yet.",0)
     # SIESTA
     elif dft_code in ["siesta","Siesta","SIESTA"]:
@@ -69,3 +90,11 @@ def get_dft_code(data,mdfile,name):
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
+def init_dft_dir():
+    """
+    Create new directory and copy input files into this
+    """
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+def init_dft_dir():

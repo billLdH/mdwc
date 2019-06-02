@@ -5,15 +5,51 @@ from __future__ import division, print_function
 
 import re
 import sys
+from time import time, strftime, localtime
 from netCDF4 import Dataset
 from mdwc.info import Info
+from mdwc.io.db import *
 import numpy as np
 
+class Data:
+    def __init__(self,name):
+        self.datafile = name+'.out_data'
+        self.data = None
 
-def create_output_file(name):
+# * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+def init_datafile(datafile,md):
+    """
+    Initialize data file (default output)
+    """
+
+    datafile.data = open(datafile.datafile")
+    data.data.write("#%8s %8s %7s %7s%5s %8s %6s %4s %13s %9s"
+        % ("time(fs)", "tot_step", "md_step", md.dft_code, "_step",
+           "E(har)", "T(K)", "P(har/Bohr^3)", "V(Bohr^3)")
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+def close_datafile(datafile):
+    """
+    Close data file (default output)
+    """
+    datafile.data.close()
+    print("End of the mdwc calculation.")
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+def create_output(name):
+    """
+    Open main output and ddb
+    """
+    # Main
     out = sys.stdout
-    stdout = open(name+'.txt', 'w')
+    stdout = open(name+'.out_md', 'w')
     sys.stdout = stdout
+
+    # Database
+    open_db(db)
     return stdout
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -25,9 +61,12 @@ def close_output_file(name):
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-def start_message():
-    info= Info()
+def start_message(info):
+    """
+    Start message
+    """
     print("""
+ Starting date: %s     
 
       __   __    ____     _   _   _    _____
      |  \ /  |  |    \   | | | | | |  |  ___| 
@@ -48,7 +87,8 @@ def start_message():
  Download url: %s
  Official Web site: %s
 
-    """   % (info.__name__, \
+    """   % (strftime("%Y-%m-%d %H:%M:%S", localtime()),
+             info.__name__, \
              info.__version__, \
              info.__date__, \
              info.__license__, \
@@ -60,6 +100,12 @@ def start_message():
              info.__url__) 
            )
 
+# * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+def end_message():
+    """
+    End message
+    """
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 

@@ -3,6 +3,7 @@
 
 from __future__ import division, print_function
 import sys
+import re
 import setuptools
 # from setuptools import setup
 from numpy.distutils.core import Extension
@@ -15,7 +16,7 @@ if sys.version_info[0] != 3:
 
 try:
     import numpy
-except ImportError, e:
+except ImportError:
     sys.stderr.write('Numpy package is needed to use this package.\n')
     sys.exit(0)
 
@@ -44,10 +45,12 @@ wrapper = [Extension('libmdwc.parameters',
                              'libmdwc/libmdwc.F90'])]
 
 # Add informations
-lines= open("mdwc/INFO.txt").readlines()
+lines= open("PACKAGE_INFO.txt").readlines()
 info= dict()
 for line in lines:
-    info[str(line.split("=")[0])] = str(line.split("=")[1])
+    split = re.split('[=\n]',line)
+    split = [s.replace('"','') for s in split]
+    info[str(split[0])] = str(split[1])
 
 # Setup
 setup(

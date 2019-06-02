@@ -1,23 +1,10 @@
-# PACKAGE_INFO
-
-   mdwc
-      |
-      |- libmdwc: Fortran sources
-      |
-      |- examples: mdwc calculation, jupyter notebooks, libmdwc's call
-      |
-      |- scripts: Python executables (mdwc_, post-treatment,...)
-      |
-      |- setup.py: Configure the Python library's installation
-      |
-      |- mdwc: Python Library
-	    |
-	    |- core: Main functions
-            |
-            |- dft: Interfaces with DFT codes
-	    |
-	    |- info.py: Informations on the mdwc code
-            |
-            |- io: Read/write main output, databases,...
-	    |
-            |- tools: Post-treatment tools, helper,...
+__name__="mdwc"
+__version__="0.2.0"
+__author__="Aldo H. Romero, Arturo Hernandez, Uthpala Herath, Pedram Tavazohi"
+__license__="TO BE SET"
+__maintainer__="Aldo H. Romero"
+__maintainer_email__="Aldo.Romero@mail.wvu.edu"
+__description__="Molecular Dynamics With Constraints"
+__date__="June 2019"
+__url__="https://molecular-dynamics-with-constraints.github.io/"
+__download_url__="https://github.com/romerogroup/mdwc.git"

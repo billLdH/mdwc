@@ -2,13 +2,16 @@
 # -*- coding=utf-8 -*-
 
 from __future__ import division, print_function
+import re
 
 class Info:
     def __init__(self,info_file):
-        self.lines= open("mdwc/INFO.txt").readlines()
+        self.lines= open(info_file).readlines()
         info= dict()
         for line in lines:
-            info[str(line.split("=")[0])] = str(line.split("=")[1])
+            split = re.split('[=\n]',line)
+            split = [s.replace('"','') for s in split]
+            info[str(split[0])] = str(split[1])
 
         self.__name__=info["__name__"]
         self.__version__ =info["__version__"]

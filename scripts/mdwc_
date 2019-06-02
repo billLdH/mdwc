@@ -80,7 +80,7 @@ CONTRIBUTORS
 """
 
 from __future__ import division, print_function
-from mdwc.manager.manager import main
+from mdwc.core.manager import main
 
 if __name__ == "__main__":
 	main()
