@@ -48,7 +48,7 @@ class Constraints:
         self.vol_value = None
         self.vol_bool = None
 
-    def get_md_constrains(mdfile):
+    def get_md_constrains(self,mdfile):
         data= open(mdfile).readlines()
         for line in data:
             # Remove comment

@@ -29,44 +29,6 @@ class DB:
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-def check_db_packages():
-    """
-    Check if a MD database can be created.
-    """
-    packages = ['xml',
-                'yaml',
-                'netCDF4',
-                'csv',
-                'json']
-
-    db_fmt = [str(re.findall('\s*db_fmt\s+(.*)',line)[0].split()[0]) \
-                 for line in data if re.match('db_fmt')]
-
-    if db_fmt in ["XML","xml"]:
-        db_fmt= "xml"
-        pkg= "xml"
-    elif db_fmt in ["YAML","yaml"]:
-        db_fmt= "yaml"
-        pkg= "yaml"
-    elif db_fmt in ["NETCDF","netCDF","NetCDF","netcdf"]:
-        db_fmt= "netcdf"
-        pkg= "NetCDF4"
-    elif db_fmt in ["CSV","csv"]:
-        db_fmt= "csv"
-        pkg= "csv"
-    elif db_fmt in ["JSON","json"]:
-        db_fmt= "json"
-        pkg= "json"
-
-    try:
-        import pkg
-    except ImportError:
-        _error(pkg+" package not installed.",0)
-
-    return db_fmt
-
-# * * * * * * * * * * * * * * * * * * * * * * * * * *
-
 def open_db(db):
     """
     Interface to open db file

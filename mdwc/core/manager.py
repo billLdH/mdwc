@@ -19,15 +19,6 @@ from mdwc.info import Info
 from mdwc.io.db import *
 from mdwc.dft.interface import Calculator
 
-def _error(message,code):
-    """ 
-    Print error message and exit
-    """
-    print(message)
-    exit(code)
-
-# * * * * * * * * * * * * * * * * * * * * * * * * * *
-
 def check():
     """ 
     Check options and if file.md exists

@@ -12,6 +12,7 @@ import subprocess
 import argparse
 from mdwc.core.molecular_dynamics import md_nvt_constrains, md_npt_constrains
 from mdwc.dft import *
+from libmdwc.libmdwc import *
 
 class MD:
     """
@@ -197,7 +198,7 @@ def run_md(calc,md,constr,name,dft_code,datafile):
             md.s_t=1.0       #thermostat degree of freedom
             md.s_tdot= 0.0  #time derivative of thermostat degree of freedom
             work_dir= name+str(i_dft_step)
-            subprocess.call(['mkdir', work_dir],shell=True)
+            subprocess.call('mkdir %s' work_dir,shell=True)
             # Specific to Abinit (an interface should be called) ==> init_dft_dir
             from_prototype_in_to_in_step0(name+'.in', work_dir+'/'+name+str(i_dft_step)+'.in')
             from_prototype_file_to_file(name+'.files', work_dir+'/'+name+str(i_dft_step)+'.files', i_dft_step)
@@ -213,11 +214,8 @@ def run_md(calc,md,constr,name,dft_code,datafile):
         #-----------
         job= subprocess.Popen(calc.command, bufsize=1048576, shell=True,\
         stdout=log, stdin=rf, cwd=work_dir)
+        job.wait()
 
-        n=0
-        while job.poll() == None:
-            #print job.poll()
-            time.sleep(30)
             # Specific to Abinit (an interface should be called to check endding of run)
             if os.path.exists(work_dir+'/'+name+str(i_dft_step)+'.out'):
                 output= open(work_dir+'/'+name+str(i_dft_step)+'.out','r')
@@ -241,9 +239,9 @@ def run_md(calc,md,constr,name,dft_code,datafile):
         #---------------
         if i_dft_step == 0:
             # Initialization of velocities
-            md.v_t= md_ft.npt_md_suite.init_vel_atoms(mass, md.temp, len(mass))
-            md.h_t_dot= md_ft.npt_md_suite.init_vel_lattice(bmass, md.temp, md.h_t)
-            md.x_t_dot= md_ft.npt_md_suite.get_x_dot(md.h_t, md.v_t, nat)
+            md.v_t= init_vel_atoms(mass, md.temp, len(mass))
+            md.h_tdot= init_vel_lattice(bmass, md.temp, md.h_t)
+            md.x_tdot= get_x_dot(md.h_t, md.v_t, nat)
             
         #--------------
         #   RUN  NPT

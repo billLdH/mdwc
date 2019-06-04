@@ -24,3 +24,37 @@ class Info:
         self.__date__ = info["__date__"]
         self.__url__= info["__url__"]
         self.__download_url__=info["__download_url__"]
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+def get_system_info():
+    """
+    Print informations on the current system
+    """
+    print("""
+ < i > System informations
+ System:       %s
+ Release:      %s
+ Machine:      %s
+ Processor:    %s
+ Architecture: %s
+    """ % (platform.system(),
+           platform.release(),
+           platform.machine(),
+           platform.processor(),
+           platform.architecture()[0]))
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+def get_python_info():
+    """
+    Print informations on the python tool
+    """
+    print("""
+ < i > Python informations
+ Version:        %s
+ Compiler:       %s
+ Implementation: %s
+    """ % (platform.python_version(),
+           platform.python_compiler(),
+           platform.python_implementation())
