@@ -5,7 +5,6 @@ from __future__ import division, print_function
 import sys
 import re
 import setuptools
-# from setuptools import setup
 from numpy.distutils.core import Extension
 from numpy.distutils.core import setup
 

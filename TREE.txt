@@ -12,12 +12,16 @@
       |
       |- mdwc: Python Library
 	    |
-	    |- core: Main functions
+	    |- core: Main functions and objects (MD, Constraints)
             |
-            |- dft: Interfaces with DFT codes
+            |- dft: Interface with DFT codes
 	    |
-	    |- info.py: Informations on the mdwc code
-            |
-            |- io: Read/write main output, databases,...
+            |- io: Read/write main output, databases, dft files
+	    |   |
+	    |   |- db: Databases
+            |   |
+	    |   |- dft: DFT codes
 	    |
-            |- tools: Post-treatment tools, helper,...
+            |- postmdwc: Post-treatment tools, helper,...
+	    |
+	    |- utils: general tools (checks, infos, timer,...)
