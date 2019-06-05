@@ -14,13 +14,15 @@
 	    |
 	    |- core: Main functions and objects (MD, Constraints)
             |
-            |- dft: Interface with DFT codes
+            |- dft: Interface with DFT codes, objects
 	    |
-            |- io: Read/write main output, databases, dft files
+            |- io: Read/write input/output files
 	    |   |
 	    |   |- db: Databases
             |   |
 	    |   |- dft: DFT codes
+	    |   |
+	    |   |- md: MD files
 	    |
             |- postmdwc: Post-treatment tools, helper,...
 	    |

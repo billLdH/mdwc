@@ -8,6 +8,13 @@ import os.path
 import numpy as np
 
 
+class Abinit:
+    def __init__(self,finput,ffiles,foutput):
+    def read_input(self,filename):
+        self.input = readAbinitIn(filename)
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * *
+
 def check_abinit_files(name):
     """
     Check if the following files exist:

@@ -33,7 +33,8 @@ packages=['libmdwc',
           'mdwc.io',
           'mdwc.io.db',
           'mdwc.io.dft',
-          'mdwc.tools',
+          'mdwc.io.md',
+          'mdwc.postmdwc',
           'mdwc.utils']
 
 wrapper = [Extension('libmdwc.parameters',
