@@ -10,14 +10,14 @@ import numpy as np
 import argparse
 from mdwc.dft import *
 
-def Calculator:
+class Calculator:
     def _init__(self,dft_code,input_para):
         self.dft_code = dft_code[0]
         self.dft_exec = dft_code[1]
         self.dft_opts = dft_code[2]
         self.calc_np = input_para["np"]
         self.calc_opts = input_para["mpi_options"]
-        self.command
+        self.command = None
 
         if self.calc_np not None and
            self.calc_np > 1:
@@ -28,7 +28,43 @@ def Calculator:
             self.command = ""
 
         self.command += "%s %s" % (self.dft_exec,self.dft_opts)
-        
+
+    def get_dft_code(self):
+        return self.dft_code
+
+    def get_dft_exec(self):
+        return self.dft_exec
+
+    def get_dft_opts(self):
+        return self.dft_opts
+
+    def get_calc_np(self):
+        return self.calc_np
+
+    def get_calc_opts(self):
+        return self.calc_opts
+
+    def get_command(self):
+        return self.command
+
+    def set_dft_code(self,dft_code):
+        self.dft_code= dft_code
+
+    def set_dft_exec(self,dft_exec):
+        self.dft_exec= dft_exec
+
+    def set_dft_opts(self,dft_opts):
+        self.dft_opts= dft_opts
+
+    def set_calc_np(self,calc_np):
+        self.calc_np= calc_np
+
+    def set_calc_opts(self,calc_opts):
+        self.calc_opts= calc_opts
+
+    def set_command(self,command):
+        self.command= command
+
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 def get_dft_code(data,mdfile,name):

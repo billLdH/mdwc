@@ -89,11 +89,12 @@ def check_md_type(input_para,mdfile):
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-def check_dft_code():
+def check_dft_code(mdfile,name):
     """
     Check if DFT code is correctly set as well as the existence of the executable
     """
-        # DFT Code
+    # DFT Code
+    data= open(mdfile).readlines()
     dft_code = interface.get_dft_code(data,mdfile,name)
 
     # Absolute path to a pecific executable of the DFT code
@@ -119,7 +120,7 @@ def check_dft_code():
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-def check_db_packages():
+def check_db_packages(mdfile):
     """
     Check if a MD database can be created.
     """
@@ -129,6 +130,7 @@ def check_db_packages():
                 'csv',
                 'json']
 
+    data= open(mdfile).readlines()
     db_fmt = [str(re.findall('\s*db_fmt\s+(.*)',line)[0].split()[0]) \
                  for line in data if re.match('db_fmt')]
 

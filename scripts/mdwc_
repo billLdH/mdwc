@@ -81,7 +81,9 @@ CONTRIBUTORS
 
 from __future__ import division, print_function
 from mdwc.core.manager import main
+from mdwc.utils.timer import timer
 
 if __name__ == "__main__":
-	main()
+    @timer
+    main()
 

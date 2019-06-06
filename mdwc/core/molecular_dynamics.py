@@ -25,7 +25,6 @@ class MD:
         self.mdtype = mdtype
         self.mdstep = None
         self.dftstep = None
-        self.dft_code = dft_code
         self.qmass = None
         self.bmass = None
         self.dt = None
@@ -35,6 +34,84 @@ class MD:
         self.dft_steps = None
         self.total_steps = None
         self.temp = None
+
+    def get_mdfile(self):
+        return self.mdfile
+
+    def get_mdtype(self):
+        return self.mdtype
+
+    def get_mdstep(self):
+        return self.mdstep
+
+    def get_md_steps(self):
+        return self.md_steps
+
+    def get_dft_steps(self):
+        return self.dft_steps
+
+    def get_total_steps(self):
+        return self.total_steps
+
+    def get_temp(self):
+        return self.temp
+
+    def get_dftstep(self):
+        return self.dftstep
+    
+    def get_bmass(self):
+        return self.bmass
+
+    def get_qmass(self):
+        return self.qmass
+
+    def get_dt(self):
+        return self.dt
+
+    def get_pressure(self):
+        return self.pressure
+
+    def get_correct_spteps(self):
+        return self.correct_spteps
+
+    def set_bmass(self,bmass):
+        self.bmass = bmass
+
+    def set_qmass(self,qmass):
+        self.qmass = qmass
+
+    def set_mdfile(self,mdfile):
+        self.mdfile = mdfile
+
+    def set_mdtype(self,mdtype):
+        self.mdtype = mdtype
+
+    def set_mdstep(self,mdstep):
+        self.mdstep = mdstep
+
+    def set_md_steps(self,md_steps):
+        self.md_steps = md_steps
+
+    def set_dftstep(self,dftstep):
+        self.dftstep = dftstep
+
+    def set_dft_steps(self,dft_steps):
+        self.dft_steps = dft_steps
+
+    def set_dt(self,dt):
+        self.dt = dt
+
+    def set_pressure(self,pressure):
+        self.pressure = pressure
+
+    def set_correct_spteps(self,correct_spteps):
+        self.correct_spteps = correct_spteps
+
+    def set_total_steps(self,total_steps):
+        self.total_steps = total_steps
+
+    def set_temp(self,temp):
+        self.temp = temp
 
     def get_md_parameters(self):
         data= open(self.mdfile).read()

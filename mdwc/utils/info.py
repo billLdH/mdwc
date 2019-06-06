@@ -25,6 +25,42 @@ class Info:
         self.__url__= info["__url__"]
         self.__download_url__=info["__download_url__"]
 
+    def get_name(self):
+        self.__name__
+
+    def get_version(self):
+        self.__version__
+
+    def get_license(self):
+        self.__license__
+
+    def get_author(self):
+        self.__author__
+
+    def get_maintainer(self):
+        self.__maintainer__
+
+    def get_university(self):
+        self.__university__
+
+    def get_maintainer_email(self):
+        self.__maintainer_email__
+
+    def get_description(self):
+        self.__description__
+
+    def get_date(self):
+        self.__name__
+
+    def get_name(self):
+        self.__name__
+
+    def get_url(self):
+        self.__url__
+
+    def get_download_url(self):
+        self.__download_url__
+
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 def get_system_info():

@@ -9,6 +9,7 @@ from time import time, strftime, localtime
 from netCDF4 import Dataset
 from mdwc.info import Info
 from mdwc.io.db import *
+from mdwc.utils.timer import today_txt
 import numpy as np
 
 class Data:
@@ -87,7 +88,7 @@ def start_message(info):
  Download url: %s
  Official Web site: %s
 
-    """   % (strftime("%Y-%m-%d %H:%M:%S", localtime()),
+    """   % (today_txt(),
              info.__name__, \
              info.__version__, \
              info.__date__, \
