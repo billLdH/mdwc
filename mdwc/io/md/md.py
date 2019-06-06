@@ -14,4 +14,3 @@ def ParserMD(mdfile):
     data = open(mdfile).readlines()
     tags = [line.split()[0] for line in data]
     tags = [tags.remove(tag) for tag in tags if "#" in tag]
-
