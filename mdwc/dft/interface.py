@@ -67,6 +67,34 @@ class Calculator:
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
+class DFTresults:
+    def get_convergence(self):
+        return
+
+    def get_total_energy(self):
+        return
+
+    def get_atomic_positions(self):
+        return
+
+    def get_forces(self):
+        return
+
+    def get_stress_tensor(self):
+        return
+
+    def get_magnetic_moments(self):
+        return
+
+    def get_lattice(self):
+        return
+
+    def get_reciprocal_lattice(self):
+        return
+    
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * *
+
 def get_dft_code(data,mdfile,name):
     """
     Select DFT Code

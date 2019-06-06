@@ -10,8 +10,14 @@ import numpy as np
 
 class Abinit:
     def __init__(self,finput,ffiles,foutput):
+
     def read_input(self,filename):
+        if not os.path.isfile(filename):
+            _error("Abinit input file "+ filename+ " is missing.",0)
         self.input = readAbinitIn(filename)
+
+
+    
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 

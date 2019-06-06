@@ -7,9 +7,9 @@ import re
 import sys
 
 def readAbinitIn(filename):
-
+    # Use of a parser
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 def readAbinitOut(filename):
-
+    # Use of a parser
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
