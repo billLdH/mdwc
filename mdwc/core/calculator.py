@@ -29,6 +29,14 @@ class Calculator:
 
         self.command += "%s %s" % (self.dft_exec,self.dft_opts)
 
+    def initialize(self,command):
+        self.command = command
+
+    def run(self):
+        Popen()
+        poll
+        wait
+
     def get_dft_code(self):
         return self.dft_code
 

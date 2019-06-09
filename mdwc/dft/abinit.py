@@ -16,6 +16,8 @@ class Abinit:
             _error("Abinit input file "+ filename+ " is missing.",0)
         self.input = readAbinitIn(filename)
 
+    def init_from_file(self):
+        self.input= AbinitInputFiles(files)
 
     
 

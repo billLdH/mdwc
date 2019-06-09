@@ -7,15 +7,17 @@ class Structure:
     """
     Structure class
     """
-    def __init__(self):
-        self.lattice = None
-        self.xred = None
-        self.xcart = None
-        self.fcart = None
-        self.strten = None
-        self.vel = None
-        self.vel_h = None
-        self.amu = None
+    def __init__(self, lattice, acell=None,xred, xcart=None,fcart,
+                 strten, vel=None, vel_h=None, amu):
+        self.lattice = lattice
+        self.acell = acell
+        self.xred = xred
+        self.xcart = xcart
+        self.fcart = fcart
+        self.strten = strten
+        self.vel = vel
+        self.vel_h = vel_h
+        self.amu = amu
 
     def get_lattice(self):
         return self.lattice

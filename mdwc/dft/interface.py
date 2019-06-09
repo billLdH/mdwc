@@ -91,9 +91,7 @@ class DFT:
     def get_rec_lattice(self):
         return
     
-# * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-def initialize_dft():
+    def initialize_dft():
     """
     Create new directory and copy input files into this
     """
