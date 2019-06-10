@@ -18,22 +18,25 @@ class MD:
     """
     Molecular Dynamics class
     """
-    def __init__(self,path_to_file,mdtype,dft_code):
-
+    def __init__(self,name,wkdir):
+        self.mdfile= wkdir+"/"+name+".md"
         # Input MD parameters
-        self.mdfile = path_to_file
-        self.mdtype = mdtype
-        self.mdstep = None
-        self.dftstep = None
-        self.qmass = None
-        self.bmass = None
-        self.dt = None
-        self.pressure = None
-        self.correct_spteps = None
-        self.md_steps = None
-        self.dft_steps = None
-        self.total_steps = None
-        self.temp = None
+        self.mdInput= readMDIn(self.mdfile)
+        self.mdtype = self.mdInput["mdtype"]
+        check_md_type(self.mdtype)
+        self.mdstep = self.mdInput["mdstep"]
+        self.dftstep = self.mdInput["dftstep"]
+        self.qmass = self.mdInput["qmass"]
+        self.bmass = self.mdInput["bmass"]
+        self.dt = self.mdInput["dt"]
+        self.pressure = self.mdInput["pressure"]
+        self.correct_spteps = self.mdInput["correct_spteps"]
+        self.md_steps = self.mdInput["md_steps"]
+        self.dft_steps = self.mdInput["dft_steps"]
+        self.total_steps = mdInput["md_steps"]*mdInput["dft_steps"]
+        self.temp = self.mdInput["temp"]
+
+        Constraints.__init__(self,self.mdInput)
 
     def get_mdfile(self):
         return self.mdfile
@@ -232,22 +235,6 @@ class MD:
         self.x_t = None
         self.x_tdot = None
         self.f_t = None
-
-# * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-class Structure:
-    """
-    Structure class
-    """
-    def __init__(self):
-        self.lattice = None
-        self.xred = None
-        self.xcart = None
-        self.fcart = None
-        self.strten = None
-        self.vel = None
-        self.vel_h = None
-        self.amu = None
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 

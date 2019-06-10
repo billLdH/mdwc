@@ -10,7 +10,18 @@ import numpy as np
 import argparse
 from mdwc.dft import *
 
-class DFT:
+class DFTdata:
+    """
+    Object storing informations specific to DFT (energies,k-mesh,...)
+    """
+    def __init__(self):
+        self.data = dict()
+        self.data = {"convergence": False,
+                     "e_units", "eV",
+                     "etotal": 0.,
+                     "entropy": 0.}
+
+class DFT(object):
     def __init__(self,mdfile):
         sefl.mdfile = mdfile
 
@@ -82,6 +93,9 @@ class DFT:
     def get_stress_tensor(self):
         return
 
+    def get_pressure(self):
+        return
+
     def get_magnetic_moments(self):
         return
 
@@ -90,20 +104,3 @@ class DFT:
 
     def get_rec_lattice(self):
         return
-    
-    def initialize_dft():
-    """
-    Create new directory and copy input files into this
-    """
-
-
-# * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-def init_dft_dir():
-    """
-    Create new directory and copy input files into this
-    """
-
-# * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-def init_dft_dir():

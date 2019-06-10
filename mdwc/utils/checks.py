@@ -20,11 +20,10 @@ def check_python_env():
     if not all(int(item) >= 1 for item in version):
         _error('Numpy >= 1.1 1 is needed to use this package.\n',0)
 
-# * * * * * * * * * * * * * * * * * * * * * * * * * *
-
 def quick_check():
     """
     Check options and if file.md exists
+    DEPRECATED !!!!!! EVERYTHING IS INTO THE MD FILE
     """
 
     options = ["-h", "-help", "-n", "--name", "-npt", "-nvt",
@@ -41,60 +40,42 @@ def quick_check():
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-def check_filename(input_para):
+def check_filename():
     """
     Check if filename is set and return it
     """
 
     # MD file
     mdfiles = [file for file in os.listdir(".") if file.endswith('.md')]
-    if input_para['name'] is None:
-        if len(mdfiles) > 2:
-            _error("Please set name of files adding '-n [NAME]'.",0)
-        elif len(mdfiles) < 1:
-            _error("File.md does not exist in the directory.",0)
-        else:
-            name= str(mdfiles[0])
+    if len(mdfiles) > 2:
+        _error("File.md is non-unique.",0)
+    elif len(mdfiles) < 1:
+        _error("File.md does not exist in the directory.",0)
     else:
-        name= str(input_para['name'])
-        if name+".md" not in os.listdir("."):
-            _error(name+".md does not exist in the directory.",0)
+        name= str(mdfiles[0])
     return name
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-def check_md_type(input_para,mdfile):
+def check_md_type(mdtype):
     """
     Check if MD type is set and return it
     """
-        # MD type
-    if input_para["npt"] is None and input_para["nvt"] is None:
-        mdtype= [str(re.findall('\s*MD\s+(.*)',line)[0].split()[0]) \
-                 for line in open(mdfile).readlines() if re.match('MD')]
-        if len(mdtype) != 0:
-            _error("MD type is not set correctly.",0)
-        else:
-            if mdtype[0] in ["NPT","npt"]:
-                return "npt"
-            elif mdtype[0] in ["NVT","nvt"]:
-                return "nvt"
-            else:
-                _error("MD type is not set correctly.",0)
-    elif input_para["npt"] is not None and input_para["nvt"] is not None
-        _error("MD type is not set correctly.",0)
-    elif input_para["npt"] is not None:
+    # MD type
+    if mdtype in ["NPT","npt"]:
         return "npt"
-    elif input_para["nvt"] is not None:
+    elif mdtype in ["NVT","nvt"]:
         return "nvt"
+    else:
+        _error("MD type is not set correctly.",0)
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-def check_dft_code(mdfile,name):
+def check_dft_code(mdInput):
     """
     Check if DFT code is correctly set as well as the existence of the executable
     """
     # DFT Code
-    data= open(mdfile).readlines()
     dft_code = interface.get_dft_code(data,mdfile,name)
 
     # Absolute path to a pecific executable of the DFT code
@@ -156,3 +137,11 @@ def check_db_packages(mdfile):
         _error(pkg+" package not installed.",0)
 
     return db_fmt
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+def check_succeed(output,words):
+    if os.path.exists(output):
+        return str(words) in open(output).read():
+    else:
+        _error("Output not find. Error in the path.",0)

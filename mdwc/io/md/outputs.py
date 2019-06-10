@@ -12,13 +12,6 @@ from mdwc.io.db import *
 from mdwc.utils.timer import today_txt
 import numpy as np
 
-class Data:
-    def __init__(self,name):
-        self.datafile = name+'.out_data'
-        self.data = None
-
-# * * * * * * * * * * * * * * * * * * * * * * * * * *
-
 def init_datafile(datafile,md):
     """
     Initialize data file (default output)
@@ -31,23 +24,21 @@ def init_datafile(datafile,md):
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-def close_datafile(datafile):
+def init_output(name):
     """
-    Close data file (default output)
-    """
-    datafile.data.close()
-    print("End of the mdwc calculation.")
-
-# * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-def create_output(name):
-    """
-    Open main output and ddb
+    Initialize main output
     """
     # Main
     out = sys.stdout
     stdout = open(name+'.out_md', 'w')
     sys.stdout = stdout
+
+    # Header
+    # TO BE SET: $MDWC variables
+    info = Info("$MDWC/PACKAGE_INFO.txt")
+    start_message(info)
+    get_system_info()
+    get_python_info()
 
     # Database
     open_db(db)
@@ -110,6 +101,7 @@ def end_message():
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
+# NEED TO BE MODIFIED
 def write_md_output(path, bond_const, angl_const, pressure_t, volu_t, bond_constrain_t, cos_constrain_t):
     mdout_file= open(path, 'w')
     mdout_file.write('md_step     volume(Bohr^3)\n')

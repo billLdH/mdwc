@@ -11,26 +11,59 @@ import argparse
 from mdwc.dft import *
 
 class Calculator:
-    def _init__(self,dft_code,input_para):
-        self.dft_code = dft_code[0]
-        self.dft_exec = dft_code[1]
-        self.dft_opts = dft_code[2]
-        self.calc_np = input_para["np"]
-        self.calc_opts = input_para["mpi_options"]
+    """
+    Calculator object (manager of the calculation)
+    """
+    def _init__(self):
         self.command = None
 
-        if self.calc_np not None and
-           self.calc_np > 1:
-            self.command = "mpirun -np %s " % self.calc_np
-            if self.calc_opts not None:
-                self.command += "%s " % self.calc_opts
-        else:
-            self.command = ""
+        # self.command += "%s %s" % (self.dft_exec,self.dft_opts)
 
-        self.command += "%s %s" % (self.dft_exec,self.dft_opts)
+        """
+        Initialize the calculation
+        1) Get main name
+        2) Create a working directory
+         WKDIR
+            |
+            |- INPUT FILES
+            |
+            |- SUBWKDIR1
+            |
+            |- SUBWKDIR2
+            .
+            .
+        """
+        self.start_time= time.clock()
+        # Quick checks
+        check_python_env()
+        # quick_check() DEPRECATED !!! EVERYTHING IS INTO THE MD FILE
 
-    def initialize(self,command):
-        self.command = command
+        # Read arguments and md file
+        self.name= check_filename()
+        wkdir= "mdwc_"+name
+        subprocess.call("mkdir %s" % wkdir, shell=True)
+        self.path= os.getcwd()
+        self.wkdir= self.path+"/"+wkdir
+        subprocess.call("cp %s %s" % (self.name,self.wkdir))
+
+    def initialize_db(self):
+        """
+        Initialize DB object
+        """
+        # Check if storage in db is possible (YAML, XML, JSON, CSV, NetCDF)
+        # In this db file, we could store for each step (few ideas):
+        #   - MD info (Qmass, Bmass, dt, species, psp, natom,...) <= only once
+        #   - Energy
+        #       # DFT
+        #       # Constraints' cost ?
+        #   - Pressure
+        #   - Temperature
+        #   - Atomic positions (reduced and cartesian)
+        #   - Cell (parameters and angles)
+        #   - Volume
+        #   - Stress tensor
+        #   - Forces (atoms, cell,...)
+        db_fmt= check_db_packages(mdfile)
 
     def run(self):
         Popen()
@@ -75,11 +108,28 @@ class Calculator:
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-def init_dft_dir():
-    """
-    Create new directory and copy input files into this
-    """
+def initialize_md(name):
+    # Read md files
+    mdfile= name+".md"
+    # readMDIn() should replace following lines and put everything into a dict
+    self.mdtype= check_md_type(self.input_para,self.mdfile)
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-def init_dft_dir():
+def initialize_dft(self):
+    """
+    Initialize DFT object
+    """
+    self.dft_code= check_dft_code(self.mdfile,self.name)
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+def init_dft_dir(name, xred, h, step, pwd= None):
+    """
+    Create new directory and copy input files into this
+    """
+    directory = name+str(step)
+    subprocess.call('mkdir %s' % directory, shell=True)
+    [subprocess.call('cp %s %s/' % (f_in,directory)) for f_in in inputs]
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * *

@@ -9,6 +9,9 @@ class Structure:
     """
     def __init__(self, lattice, acell=None,xred, xcart=None,fcart,
                  strten, vel=None, vel_h=None, amu):
+        self.natom = natom
+        self.ntypat = ntypat
+        self.typat = typat
         self.lattice = lattice
         self.acell = acell
         self.xred = xred
@@ -18,6 +21,8 @@ class Structure:
         self.vel = vel
         self.vel_h = vel_h
         self.amu = amu
+
+        self.structure = 
 
     def get_lattice(self):
         return self.lattice

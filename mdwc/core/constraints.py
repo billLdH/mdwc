@@ -10,45 +10,48 @@ class Constraints:
         """
         Constraints class
         """
-    def __init__(self):
+    def __init__(self,inputs):
 
         # Atoms
-        self.nb_atoms = None
-        self.atoms = None
-        self.atom_pos = None
-        self.atom_coords = None
-        self.atoms_bool = None
+        self.nb_atoms = inputs["nb_atoms"]
+        self.atoms = inputs["atoms"]
+        self.atom_pos = inputs["atom_pos"]
+        self.atom_coords = inputs["atom_coords"]
+        self.atoms_bool = inputs["atoms_bool"]
 
         # Bonds
-        self.nb_bonds = None
-        self.bonds = None
-        self.bond_dist = None
-        self.bonds_bool = None
+        self.nb_bonds = inputs["nb_bonds"]
+        self.bonds = inputs["bonds"]
+        self.bond_dist = inputs["bond_dist"]
+        self.bonds_bool = inputs["bonds_bool"]
 
         # Angles
-        self.nb_angles = None
-        self.angles = None
-        self.cos_angle = None
-        self.angles_bool = None
+        self.nb_angles = inputs["nb_angles"]
+        self.angles = inputs["angles"]
+        self.cos_angle = inputs["cos_angle"]
+        self.angles_bool = inputs["angles_bool"]
 
         # Cell parameters (a, b, c)
-        self.nb_cell_params = None
-        self.cell_params = None
-        self.cell_param_lgth = None
-        self.cell_params_bool = None
+        self.nb_cell_params = inputs["nb_cell_params"]
+        self.cell_params = inputs["cell_params"]
+        self.cell_param_lgth = inputs["cell_param_lgth"]
+        self.cell_params_bool = inputs["cell_params_bool"]
 
         # Cell angles
-        self.nb_cell_angles = None
-        self.cell_angles = None
-        self.cos_cell_angles = None
-        self.cell_angles_bool = None
+        self.nb_cell_angles = inputs["nb_cell_angles"]
+        self.cell_angles = inputs["cell_angles"]
+        self.cos_cell_angles = inputs["cos_cell_angles"]
+        self.cell_angles_bool = inputs["cell_angles_bool"]
 
         # Volume
-        self.vol = None
-        self.vol_value = None
-        self.vol_bool = None
+        self.vol = inputs["vol"]
+        self.vol_value = inputs["vol_value"]
+        self.vol_bool = inputs["vol_bool"]
 
     def get_md_constrains(self,mdfile):
+        """
+        DEPRECATED !!!!
+        """
         data= open(mdfile).readlines()
         for line in data:
             # Remove comment

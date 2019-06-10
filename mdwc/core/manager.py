@@ -23,6 +23,8 @@ from mdwc.utils.checks import *
 def get_arguments:
     """
     Read arguments
+    DEPRECATED !!!!! ARGUMENTS ARE NOT READ NOW
+                     EVERYTHING IS PUT INTO MD FILE
     """
     parser = argparse.ArgumentParser(description='Paramenters for MD')
     parser.add_argument("-n", "--name",
@@ -64,25 +66,32 @@ def main():
     """
     Main
     """
-    # Header
-    info = Info("../PACKAGE_INFO.txt")
-    start_message(info)
-    get_system_info()
-    get_python_info()
-    
-    # Time
-    main_time = time.clock() 
 
-    # Checks arguments and if input files are here
-    check_python_env()
-    quick_check()
-    input_para = get_arguments()
-    name= check_filename(input_para)
-    mdfile= name+".md"
-    # readMDIn()
-    mdtype= check_md_type(input_para,mdfile)
-    dft_code= check_dft_code(mdfile,name)
+    main_time = time.clock()
 
+    # SHOULD BE SET IN THE SETUP.PY (USEFUL ?)
+    # subprocess.call("export MWDC_DIR=...")
+
+    # Initialize path, directories and name
+    calc= Calculator()
+    name= calc.name
+    wkdir= calc.wkdir
+
+    # Start writing main output
+    init_output(name)
+
+    # Initialize Molecular Dynamics and Constraints objects
+    md= MD(name,wkdir)
+
+    # Write all tags into the main output
+    # MD.write_parameters()
+    # Constraints.write_parameters()
+
+    # Initialize DFT
+    DFT()
+    #     dft_code= check_dft_code(mdfile,name)
+
+    # Initialize Database
     # Check if storage in db is possible (YAML, XML, JSON, CSV, NetCDF)
     # In this db file, we could store for each step (few ideas):
     #   - MD info (Qmass, Bmass, dt, species, psp, natom,...) <= only once
@@ -96,42 +105,18 @@ def main():
     #   - Volume
     #   - Stress tensor
     #   - Forces (atoms, cell,...)
-    db_fmt= check_db_packages(mdfile)
-    db = DB(name,db_fmt)
+    #   db_fmt= check_db_packages(mdfile)
+    #   db = DB(name,db_fmt)
 
-    # Initialize calculator
-    calc= Calculator(dft_code,input_para)
-
-    # Initialize outputs
-    datafile = Data(name)
-    init_datafile(datafile,md)
-    stdout= create_output(name,db_fmt)
-    info= Info("PACKAGE_INFO.txt")
-    start_message(info)
-
-    # Set Molecular Dynamics
-    md = mdwc_manager.MD(mdfile,mdtype,dft_code[0])
-    md.get_md_parameters()
-    md.total_steps= md.md_steps*md.dft_steps
-    md.temp_data_reader(md.total_steps)
-    # write_output()
-    # write_db() <---- Needs an interface
-
-    # Set Constraints
-    constr = mdwc_manager.Constraints(md.mdfile)
-    constr.get_md_constrains()
-    # write_output()
-    # write_db() <---- Needs an interface
     print("Initialization duration: ",str(datetime.timedelta(time.clock() - main_time)))
 
     # Run MD
     run_md(calc,md,constr,name,dft_code,datafile)
 
-    # Close everything
-    close_output_file(name)
+    #     # Close everything
     close_db(db)
     close_datafile(datafile)
-   
-    # Time
+
     print("Endding date: ",strftime("%Y-%m-%d %H:%M:%S", localtime()))
     print("Calculation duration: ",str(datetime.timedelta(time.clock() - main_time)))
+    close_output_file(name)

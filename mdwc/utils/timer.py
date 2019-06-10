@@ -27,4 +27,3 @@ def today():
 
 def today_txt():
     return strftime("%H:%M:%S %B %d, %Y")
-
