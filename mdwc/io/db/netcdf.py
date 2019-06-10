@@ -7,7 +7,8 @@ import sys
 import os
 import netCDF4
 
-class NetCDF:
+
+class NetCDF(Database):
     def __init__(self,ncfile,dft_code):
         self.ncfile = ncfile
         self.dft_code = dft_code

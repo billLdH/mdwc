@@ -50,7 +50,7 @@ class Constraints:
 
     def get_md_constrains(self,mdfile):
         """
-        DEPRECATED !!!!
+        DEPRECATED !!!! SHOULD BE REMOVED ONCE THE MD SPARER IS CREATED
         """
         data= open(mdfile).readlines()
         for line in data:
@@ -184,6 +184,9 @@ class Constraints:
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 def get_constrains_values(line,tag,num,out_type):
+        """
+        DEPRECATED !!!! SHOULD BE REMOVED ONCE THE MD SPARER IS CREATED
+        """
 	# Read data
 	array = re.findall('\s*'+str(tag)+'\s+(.*)', line)[0].split(',')
 	array.remove('')

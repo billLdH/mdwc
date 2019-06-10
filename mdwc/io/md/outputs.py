@@ -40,13 +40,11 @@ def init_output(name):
     get_system_info()
     get_python_info()
 
-    # Database
-    open_db(db)
     return stdout
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-def close_output_file(name):
+def close_output_file(stdout):
     sys.stdout = stdout
     stdout.close()
 

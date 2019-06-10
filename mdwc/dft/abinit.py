@@ -26,8 +26,8 @@ class Abinit:
 def check_abinit_files(name):
     """
     Check if the following files exist:
-        - name.in
-        - name.files
+        - *files*
+        input file read into *files*
     """
     abi_files=[file for file in os.listdir(".") if file.endswith('.in','files')]
     if name+".in" or name+".files" not in abi_files:

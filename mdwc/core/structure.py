@@ -5,7 +5,7 @@ from __future__ import division, print_function
 
 class Structure:
     """
-    Structure class
+    Structure Object modified after each md step
     """
     def __init__(self, lattice, acell=None,xred, xcart=None,fcart,
                  strten, vel=None, vel_h=None, amu):

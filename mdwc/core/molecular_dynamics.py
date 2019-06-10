@@ -117,6 +117,9 @@ class MD:
         self.temp = temp
 
     def get_md_parameters(self):
+        """
+        DEPRECATED !!!! SHOULD BE REMOVED ONCE THE MD SPARER IS CREATED
+        """
         data= open(self.mdfile).read()
         # Barostat and Thermostat masses
         self.qmass= float(re.findall('\s*Qmass\s+(.*)',data)[0].split()[0])
@@ -141,6 +144,9 @@ class MD:
         data.close()
     
     def temp_data_reader(self):
+        """
+        DEPRECATED !!!! SHOULD BE REMOVED ONCE THE MD SPARER IS CREATED
+        """
         data_file= open(self.mdfile, 'r')
         data_file= data_file.readlines()
     

@@ -23,7 +23,7 @@ from mdwc.utils.checks import *
 def get_arguments:
     """
     Read arguments
-    DEPRECATED !!!!! ARGUMENTS ARE NOT READ NOW
+    DEPRECATED !!!!! ARGUMENTS ARE NOT READ 
                      EVERYTHING IS PUT INTO MD FILE
     """
     parser = argparse.ArgumentParser(description='Paramenters for MD')
@@ -67,28 +67,17 @@ def main():
     Main
     """
 
-    main_time = time.clock()
-
     # SHOULD BE SET IN THE SETUP.PY (USEFUL ?)
     # subprocess.call("export MWDC_DIR=...")
 
-    # Initialize path, directories and name
-    calc= Calculator()
-    name= calc.name
-    wkdir= calc.wkdir
-
-    # Start writing main output
-    init_output(name)
-
-    # Initialize Molecular Dynamics and Constraints objects
-    md= MD(name,wkdir)
+    # Initialize
+    calc= Calculator.initialize()
 
     # Write all tags into the main output
     # MD.write_parameters()
     # Constraints.write_parameters()
 
     # Initialize DFT
-    DFT()
     #     dft_code= check_dft_code(mdfile,name)
 
     # Initialize Database
@@ -111,6 +100,7 @@ def main():
     print("Initialization duration: ",str(datetime.timedelta(time.clock() - main_time)))
 
     # Run MD
+    Calculator.run()
     run_md(calc,md,constr,name,dft_code,datafile)
 
     #     # Close everything

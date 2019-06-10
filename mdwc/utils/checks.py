@@ -75,33 +75,24 @@ def check_dft_code(mdInput):
     """
     Check if DFT code is correctly set as well as the existence of the executable
     """
-    # DFT Code
-    dft_code = interface.get_dft_code(data,mdfile,name)
 
     # Absolute path to a pecific executable of the DFT code
-    exec_dft = [str(re.findall('\s*exec_dft_code\s+(.*)',line)[0].split()[0]) \
-                 for line in data if re.match('exec_dft_code')]
-    if len(exec_dft) > 1:
-        _error("Executable of the DFT code not set properly.",0)
-    elif len(exec_dft) < 1:
+    exec_dft = mdInput["exec_dft"]
+    if exec_dft is None:
         # binary in PATH
         exec_dft= dft_code
-    else:
-        # Specific executable
-        exec_dft= str(exec_dft[0])
 
     if shutil.which(exec_dft) is None:
         _error("Executable of the DFT code does not exist.",0)
 
     # DFT Code options
-    opt_dft = [str(re.findall('\s*opt_dft_code\s+(.*)',line)[0].split()[0]) \
-                 for line in data if re.match('opt_dft_code')]
+    opt_dft= mdInput["opt_dft"]
 
-    return [dft_code,exec_dft,opt_dft]
+    return dft_code,exec_dft,opt_dft
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-def check_db_packages(mdfile):
+def check_db_packages(db_fmt):
     """
     Check if a MD database can be created.
     """
@@ -110,10 +101,6 @@ def check_db_packages(mdfile):
                 'netCDF4',
                 'csv',
                 'json']
-
-    data= open(mdfile).readlines()
-    db_fmt = [str(re.findall('\s*db_fmt\s+(.*)',line)[0].split()[0]) \
-                 for line in data if re.match('db_fmt')]
 
     if db_fmt in ["XML","xml"]:
         db_fmt= "xml"

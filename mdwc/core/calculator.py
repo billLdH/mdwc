@@ -10,11 +10,11 @@ import numpy as np
 import argparse
 from mdwc.dft import *
 
-class Calculator:
+class Calculator(MD,Database,DFT):
     """
     Calculator object (manager of the calculation)
     """
-    def _init__(self):
+    def initialize(self):
         self.command = None
 
         # self.command += "%s %s" % (self.dft_exec,self.dft_opts)
@@ -33,7 +33,9 @@ class Calculator:
             .
             .
         """
+        # Starting time
         self.start_time= time.clock()
+
         # Quick checks
         check_python_env()
         # quick_check() DEPRECATED !!! EVERYTHING IS INTO THE MD FILE
@@ -41,12 +43,26 @@ class Calculator:
         # Read arguments and md file
         self.name= check_filename()
         wkdir= "mdwc_"+name
-        subprocess.call("mkdir %s" % wkdir, shell=True)
+        p= subprocess.call("mkdir %s" % wkdir, shell=True)
+        p.wait()
         self.path= os.getcwd()
         self.wkdir= self.path+"/"+wkdir
-        subprocess.call("cp %s %s" % (self.name,self.wkdir))
+        p= subprocess.call("cp %s %s" % (self.name,self.wkdir))
+        p.wait()
 
-    def initialize_db(self):
+        # Initialize output
+        self.stdout= init_output(name)
+
+        # Initialize Molecular Dynamics and Constraints objects
+        MD.__init__(name,wkdir)
+
+        # Initialize Database
+        DB.__init__(MD.mdInput,name)
+
+        # Initialize DFT
+        DFT.__init__(MD.mdInput,name)
+
+    def init_db(self):
         """
         Initialize DB object
         """

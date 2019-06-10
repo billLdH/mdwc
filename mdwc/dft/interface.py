@@ -23,10 +23,8 @@ class DFTdata:
 
 class DFT(object):
     def __init__(self,mdfile):
-        sefl.mdfile = mdfile
 
-        data= open(mdfile).readlines()
-        dft_code= [line for line in data if "dft_code" in line]
+        dft_code = mdInput["dft_code"]
         if len(code) > 1:
             _error("More than one DFT codes are given in input file.",0)
         elif len(code) < 1:
@@ -74,6 +72,15 @@ class DFT(object):
         elif dft_code in ["Wien2k","wien2k","WIEN2K"]:
             self.dft_code= "wien2k"
             _error("Not implemented yet.",0)
+
+
+        self.opt_dft= mdInput["opt_dft"]
+        exec_dft = mdInput["exec_dft"]
+        if exec_dft is None:
+            # binary in PATH
+            exec_dft= dft_code
+        if shutil.which(exec_dft) is None:
+            _error("Executable of the DFT code does not exist.",0)
 
     def get_convergence(self):
         return
