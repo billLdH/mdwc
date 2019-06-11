@@ -10,7 +10,7 @@ import numpy as np
 import argparse
 from mdwc.dft import *
 
-class Calculator(MD,Database,DFT):
+class Calculator(MD,Database,DFT,Structure):
     """
     Calculator object (manager of the calculation)
     """
@@ -53,33 +53,81 @@ class Calculator(MD,Database,DFT):
         # Initialize output
         self.stdout= init_output(name)
 
-        # Initialize Molecular Dynamics and Constraints objects
-        MD.__init__(name,wkdir)
+        # Molecular Dynamics and Constraints object
+        MD.__init__(self,self.mdInput)
+        Constraints.__init__(self,self.name,self.wkdir)
 
-        # Initialize Database
-        DB.__init__(MD.mdInput,name)
-
-        # Initialize DFT
-        DFT.__init__(MD.mdInput,name)
-
-    def init_db(self):
-        """
-        Initialize DB object
-        """
-        # Check if storage in db is possible (YAML, XML, JSON, CSV, NetCDF)
-        # In this db file, we could store for each step (few ideas):
-        #   - MD info (Qmass, Bmass, dt, species, psp, natom,...) <= only once
-        #   - Energy
-        #       # DFT
-        #       # Constraints' cost ?
-        #   - Pressure
-        #   - Temperature
-        #   - Atomic positions (reduced and cartesian)
-        #   - Cell (parameters and angles)
-        #   - Volume
-        #   - Stress tensor
-        #   - Forces (atoms, cell,...)
+        # Database object
         db_fmt= check_db_packages(mdfile)
+        DB.__init__(self,self.name,db_fmt)
+
+        # DFT and Structure objects
+        init_dft_code(self,mdInput)
+        DFT.__init__(self,self.mdInput,self.name)
+        Structure.__init__(self,self.dft)
+        #return md, constr, db, dft, struct
+
+    def init_dft_code(self,mdInput):
+        dft_code= mdInput["dft_code"]
+        if len(code) > 1:
+            _error("More than one DFT codes are given in input file.",0)
+        elif len(code) < 1:
+            _error("DFT code is not given in input file.",0)
+        else:
+            dft_code= str(dft_code)
+
+        # ABINIT
+        if dft_code in ["abinit","Abinit","ABINIT"]:
+            self.dft_code= "abinit"
+            self.dft= DFT(Abinit)
+        # AIMPRO
+        elif dft_code in ["aimpro","Aimpro","AIMPRO"]:
+            self.dft_code= "aimpro"
+            _error("Not implemented yet.",0)
+        # CASTEP
+        elif dft_code in ["castep","Castep","CASTEP"]:
+            self.dft_code= "castep"
+            _error("Not implemented yet.",0)
+        # CP2K
+        elif dft_code in ["cp2k","CP2K"]:
+            self.dft_code= "cp2k"
+            _error("Not implemented yet.",0)
+        # CRYSTAL
+        elif dft_code in ["crystal","Crystal","CRYSTAL"]:
+            self.dft_code= "crystal"
+            _error("Not implemented yet.",0)
+        # ELK
+        elif dft_code in ["elk","Elk","ELK"]:
+            self.dft_code= "elk"
+            _error("Not implemented yet.",0)
+        # QUANTUM ESPRESSO
+        elif dft_code in ["QE","qe","quantum espresso",\
+                          "Quantum Espresso","QUANTUM ESPRESSO"]:
+            self.dft_code= "qe"
+            _error("Not implemented yet.",0)
+        # SIESTA
+        elif dft_code in ["siesta","Siesta","SIESTA"]:
+            self.dft_code= "siesta"
+            _error("Not implemented yet.",0)
+        # VASP
+        elif dft_code in ["vasp","Vasp","VASP"]:
+            self.dft_code= "vasp"
+            _error("Not implemented yet.",0)
+        # WIEN2K
+        elif dft_code in ["Wien2k","wien2k","WIEN2K"]:
+            self.dft_code= "wien2k"
+            _error("Not implemented yet.",0)
+
+        self.opt_dft= mdInput["opt_dft"]
+        exec_dft = mdInput["exec_dft"]
+        if exec_dft is None:
+            # binary in PATH
+            self.exec_dft= dft_code
+        else:
+            self.exec_dft= exec_dft
+        if shutil.which(exec_dft) is None:
+            _error("Executable of the DFT code does not exist.",0)
+
 
     def run(self):
         Popen()

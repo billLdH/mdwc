@@ -3,26 +3,54 @@
 
 from __future__ import division, print_function
 
-class Structure:
+class Structure(DFT):
     """
-    Structure Object modified after each md step
+    Structure Object updated after each md step
     """
-    def __init__(self, lattice, acell=None,xred, xcart=None,fcart,
-                 strten, vel=None, vel_h=None, amu):
-        self.natom = natom
-        self.ntypat = ntypat
-        self.typat = typat
-        self.lattice = lattice
-        self.acell = acell
-        self.xred = xred
-        self.xcart = xcart
-        self.fcart = fcart
-        self.strten = strten
-        self.vel = vel
-        self.vel_h = vel_h
-        self.amu = amu
+    def __init__(self, filename, acell=None,xred, xcart=None,fcart=None,
+                 strten=None, vel=None, vel_h=None, amu=None):
 
-        self.structure = 
+        # Time:t+dt
+        self.s_tdot = None
+        self.h_tdot = None
+        self.x_tdot = None
+
+        if filename is None:
+            # Unchanged
+            self.natom = natom
+            self.ntypat = ntypat
+            self.typat = typat
+            self.xcart = xcart
+            self.amu = amu
+
+            # Time:t
+            self.s_t = strten
+            self.v_t = vel
+            self.hv_t = vel_h
+            self.h_t = lattice
+            self.x_t = xred
+            self.f_t = fcart
+        else:
+            read_structure(self.dft_code,filename)
+
+    def get_dft_code(self):
+        return self.dft_code
+
+    def read_structure(self):
+        struct= DFT.read_structure(filename)
+        read_from_dict(struct)
+
+    def read_from_dict(self,dict):
+        self.natom= dict["natom"]
+        self.ntypat= dict["ntypat"]
+        self.typat= dict["typat"]
+        self.amu= dict["amu"]
+        self.s_t= dict["strten"]
+        self.v_t= dict["vel"]
+        self.hv_t= dict["vel_h"]
+        self.h_t= dict["lattice"]
+        self.x_t=dict["xred"]
+        self.f_t= dict["fcart"]
 
     def get_lattice(self):
         return self.lattice

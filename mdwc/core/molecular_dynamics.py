@@ -36,8 +36,6 @@ class MD:
         self.total_steps = mdInput["md_steps"]*mdInput["dft_steps"]
         self.temp = self.mdInput["temp"]
 
-        Constraints.__init__(self,self.mdInput)
-
     def get_mdfile(self):
         return self.mdfile
 
@@ -232,15 +230,9 @@ class MD:
             return temp_arra
 
         # Data
-        self.s_t = None
         self.s_tdot = None
-        self.p_t = None
-        self.v_t = None
-        self.h_t = None
         self.h_tdot = None
-        self.x_t = None
         self.x_tdot = None
-        self.f_t = None
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * *
 
